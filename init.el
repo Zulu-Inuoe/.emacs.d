@@ -11,6 +11,11 @@
 ;; keep customize settings in their own file
 (setq custom-file "~/.emacs.d/custom.el")
 
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default default-buffer-file-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
+
 (load custom-file t)
 
 ;; Tell emacs where central backup directory is, and turn it on
@@ -307,7 +312,9 @@
 
 (use-package csharp-mode
   :ensure t
-  :mode "\\.cs$")
+  :mode "\\.cs$"
+  :config
+  (setq c-basic-offset 2))
 
 (use-package doc-view
   :if (package-installed-p 'doc-view)
@@ -362,6 +369,10 @@
  (list '((buffer-file-name " %f" (dired-directory
                                   dired-directory
                                   (revert-buffer-function " %b" ("%b - Dir:  " default-directory)))))))
+
+(defun explorer ()
+  (interactive)
+  (async-shell-command (format "explorer \"%s\"" (subst-char-in-string ?/ ?\\ default-directory)) 0))
 
 (defun my/kill-current-buffer ()
   (interactive)

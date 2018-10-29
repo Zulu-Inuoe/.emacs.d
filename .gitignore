@@ -1,6 +1,8 @@
 /elpa/*
 /auto-save-list/*
-.sly-mrepl-history
-recentf
+/.sly-mrepl-history
+/recentf
 /server/*
+/.emacs.desktop
+/.emacs.desktop.lock
 

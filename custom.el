@@ -49,7 +49,7 @@
  '(indicate-empty-lines t)
  '(inferior-lisp-program "sbcl")
  '(inhibit-startup-screen t)
- '(js-indent-level 4)
+ '(js-indent-level 2)
  '(kept-new-versions 6)
  '(keyboard-coding-system (quote utf-8-unix))
  '(large-file-warning-threshold 26214400)
@@ -76,7 +76,7 @@
  '(nyan-wavy-trail t)
  '(package-selected-packages
    (quote
-    (helm-swoop helm-ag helm-rg smart-mode-line-powerline-theme powerline solaire-mode doom-themes sly-named-readtables sly-repl-ansi-color sly-quicklisp sly-macrostep sly elcord csharp-mode adoc-mode rg neotree magit paredit helm-purpose with-editor helm-company helm elisp-slime-nav company-quickhelp company rainbow-delimiters window-purpose nyan-mode zenburn-theme diminish use-package)))
+    (markdown-mode avy helm-swoop helm-ag helm-rg smart-mode-line-powerline-theme powerline solaire-mode doom-themes sly-named-readtables sly-repl-ansi-color sly-quicklisp sly-macrostep sly elcord csharp-mode adoc-mode rg neotree magit paredit helm-purpose with-editor helm-company helm elisp-slime-nav company-quickhelp company rainbow-delimiters window-purpose nyan-mode zenburn-theme diminish use-package)))
  '(pop-up-frames nil)
  '(purpose-preferred-prompt (quote helm) t)
  '(purpose-user-mode-purposes nil)
