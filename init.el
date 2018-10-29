@@ -58,6 +58,11 @@
 ;; Set to t to debug package loading
 (setq use-package-verbose nil)
 
+(desktop-save-mode 1)
+
+(unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
+  (package-install 'doom-themes))
+
 (cond
  ((package-installed-p 'doom-themes)
   (setq doom-themes-enable-bold t
@@ -88,26 +93,78 @@
   (progn
     (nyan-mode)))
 
-(use-package window-purpose
+(use-package elcord
   :ensure t
-  :bind (:map purpose-mode-map
-              ("C-x C-f" . nil))
-  :defer nil
   :config
   (progn
-    (purpose-mode t)
-    (defun my/display-at-bottom-and-select (buffer alist)
-      (let ((window (purpose-display-at-bottom buffer alist)))
-        (when window
-          (select-window window))
-        window))
-    (add-to-list
-     'purpose-special-action-sequences
-     '(search-results
-       purpose-display-reuse-window-purpose
-       my/display-at-bottom-and-select))))
+    (elcord-mode)))
 
-(use-package bs)
+;; (use-package window-purpose
+;;   :ensure t
+;;   :bind (:map purpose-mode-map
+;;               ("C-x C-f" . nil))
+;;   :defer nil
+;;   :config
+;;   (progn
+;;     (purpose-mode t)
+;;     (defun my/display-at-bottom-and-select (buffer alist)
+;;       (let ((window (purpose-display-at-bottom buffer alist)))
+;;         (when window
+;;           (select-window window))
+;;         window))
+
+;;     (defun purpose-display-split-sly-repl-right (buffer alist)
+;;       "Display debugger window on the right side of repl."
+;;       (let ((first-window (cl-find-if
+;;                            (lambda (window)
+;;                              (with-current-buffer (window-buffer window) (eq major-mode 'sly-mrepl-mode)))
+;;                            (window-list))))
+;;         (when first-window
+;;           (let ((new-window (split-window first-window nil 'right)))
+;;             (purpose-change-buffer buffer new-window 'window alist)
+;;             new-window))))
+
+;;     (add-to-list
+;;      'purpose-special-action-sequences
+;;      '(search-results
+;;        purpose-display-reuse-window-purpose
+;;        my/display-at-bottom-and-select))
+
+;;     (add-to-list
+;;      'purpose-special-action-sequences
+;;      '(repl
+;;        purpose-display-reuse-window-buffer
+;;        purpose-display-reuse-window-purpose
+;;        my/display-at-bottom-and-select))
+
+;;     (add-to-list
+;;      'purpose-special-action-sequences
+;;      '(status
+;;        purpose-display-reuse-window-buffer
+;;        purpose-display-reuse-window-purpose
+;;        purpose-display-split-sly-repl-right
+;;        my/display-at-bottom-and-select))
+
+;;     ;; Sly repl
+;;     (add-to-list 'purpose-user-mode-purposes '(sly-mrepl-mode . repl))
+;;     (add-to-list 'purpose-user-regexp-purposes '("\\*sly-mrepl" . repl))
+;;     ;; Sly debugger
+;;     (add-to-list 'purpose-user-mode-purposes '(sly-db-mode . status))
+;;     (add-to-list 'purpose-user-regexp-purposes '("\\*sly-db" . status))
+;;     ;; Sly inspector
+;;     (add-to-list 'purpose-user-mode-purposes '(sly-inspector-mode . status))
+;;     ;; Sly compile file
+;;     (add-to-list 'purpose-user-mode-purposes '(compilation-mode . status))
+;;     (purpose-compile-user-configuration)))
+
+
+;; ;; (use-package window-purpose-x
+;; ;;   :config
+;; ;;   (progn
+;; ;;     (purpose-x-kill-setup)
+;; ;;     (purpose-x-magit-single-on)))
+
+;; (use-package bs)
 
 (use-package rainbow-delimiters
   :ensure t
@@ -199,11 +256,11 @@
     (define-key (current-global-map)
         [remap shell-command] 'with-editor-shell-command)))
 
-(use-package helm-purpose
-  :ensure t
-  :config
-  (progn
-    (helm-purpose-setup)))
+;; (use-package helm-purpose
+;;   :ensure t
+;;   :config
+;;   (progn
+;;     (helm-purpose-setup)))
 
 ;;;editing
 (use-package paredit
@@ -269,9 +326,23 @@
     (when (package-installed-p 'sly)
       (add-hook 'sly-mode-hook 'paredit-mode))))
 
+;; (use-package projectile
+;;   :ensure t
+;;   :defer nil
+;;   :bind (:map projectile-mode-map
+;;               ("s-p" . 'projectile-command-map)
+;;               ("C-c p" . 'projectile-command-map))
+;;   :config
+;;   (progn
+;;     (projectile-mode +1)))
+
 (when (executable-find "git")
   (use-package magit
     :ensure t
+    :bind (:map magit-status-mode-map
+                ("<C-tab>" . 'my/next-window-or-buffer)
+                :map magit-diff-mode-map
+                ("<C-tab>" . 'my/next-window-or-buffer))
     :defer t
     :init
     (progn
@@ -282,10 +353,43 @@
 
 (use-package neotree
   :if (package-installed-p 'neotree)
-  :bind (([f8] . neotree-toggle)
-         :map neotree-mode-map
+  :bind (:map neotree-mode-map
               ("M-l" . my/neotree-go-up)
-              ("C-z" . my/neotree-go-down)))
+              ("C-z" . my/neotree-go-down))
+  :config
+  (progn
+    (global-set-key [f8] 'neotree-toggle)
+
+    (defun my/neotree-go-down ()
+      (interactive)
+      (let ((dst (neo-buffer--get-filename-current-line)))
+        (when (file-directory-p dst)
+          (neo-global--open-dir dst))))
+
+    (defun my/neotree-go-up ()
+      (interactive)
+      (let ((prev-root neo-buffer--start-node)
+            (new-root (file-name-directory(directory-file-name neo-buffer--start-node))))
+        (neo-global--open-dir new-root)
+        (neotree-find prev-root)))
+
+    (defun my/select-neotree-file (file)
+      (when (and file
+                 (neo-global--window-exists-p)
+                 (neo-global--file-in-root-p file))
+        (with-selected-window (selected-window)
+          (neotree-find file))))
+
+    (defadvice switch-to-buffer (after update-neotree-advice
+                                       (buffer-or-name
+                                        &optional
+                                        norecord force-same-window) activate)
+      (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
+
+    (defadvice display-buffer (after update-neotree-advice
+                                     (buffer-or-name
+                                      &optional action frame) activate)
+      (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))))
 
 (use-package rg
   :if (executable-find "rg")
@@ -305,6 +409,23 @@
   :ensure t
   :mode "\\.g4$")
 
+(use-package ggtags
+  :ensure t
+  :commands ggtags-mode
+  :diminish ggtags-mode
+  :bind (:map ggtags-mode-map
+              ("C-c g s" . ggtags-find-other-symbol)
+              ("C-c g h" . ggtags-view-tag-history)
+              ("C-c g r" . ggtags-find-reference)
+              ("C-c g f" . ggtags-find-file)
+              ("C-c g c" . ggtags-create-tags)
+              ("C-c g u" . ggtags-update-tags))
+  :init
+  (add-hook 'c-mode-common-hook
+            #'(lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                  (ggtags-mode 1)))))
+
 (use-package cperl-mode
   :ensure t
   :mode "\\.pl$"
@@ -317,32 +438,55 @@
   (setq c-basic-offset 2))
 
 (use-package doc-view
-  :if (package-installed-p 'doc-view)
-  :config
-  (progn
-    (define-key doc-view-mode-map (kbd "M-v") 'backward-page)
-    (define-key doc-view-mode-map (kbd "C-v") 'forward-page)))
+  :ensure t
+  :bind (:map doc-view-mode-map
+              ("M-v" . backward-page)
+              ("C-v" . forward-page)))
 
 (use-package lua-mode
-  :if (package-installed-p 'lua-mode)
+  :ensure t
   :mode "\\.lua$"
   :interpreter "lua")
 
+(use-package windsize
+  :ensure t
+  :bind (("C-S-<up>" . windsize-up)
+         ("C-S-<down>" . windsize-down)
+         ("C-S-<left>" . windsize-left)
+         ("C-S-<right>" . windsize-right)))
+
 (use-package markdown-mode
-  :if (package-installed-p 'markdown-mode)
+  :ensure t
   :mode "\\.text$"
   :mode "\\.markdown$"
   :mode "\\.md$"
   :mode ("README\\.md$" . gfm-mode))
 
 (use-package sly
-  :if (package-installed-p 'sly))
+  :if (package-installed-p 'sly)
+  :config
+  (progn
+    (defun kill-sly-buffers ()
+      (interactive)
+      (mapc
+       (lambda (buffer)
+         (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
+                   (eql (string-match " \\*sly" (buffer-name buffer)) 0))
+           (kill-buffer buffer)))
+       (buffer-list)))))
 
 (use-package slime
   :if (package-installed-p 'slime)
   :config
   (progn
     (setq slime-contribs '(slime-fancy))))
+
+;; automatic disassembly
+(use-package autodisass-java-bytecode   ; auto-disassemble Java bytecode
+  :ensure t)
+
+(use-package autodisass-llvm-bitcode    ; auto-disassemble LLVM bitcode
+  :ensure t)
 
 (when (eq system-type 'windows-nt)
   (set-message-beep 'silent))
@@ -496,5 +640,5 @@
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.mtl$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xaml$" . nxml-mode))
-
+(put 'list-timers 'disabled nil)
 (setq debug-on-error nil)
