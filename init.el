@@ -6,8 +6,10 @@
 ;;But only turn on for graphic displays. Otherwise a daemon will be stuck
 (setq debug-on-error (display-graphic-p))
 
-(prefer-coding-system 'utf-8-unix)
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default default-buffer-file-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
+(prefer-coding-system 'utf-8-unix)
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
 
