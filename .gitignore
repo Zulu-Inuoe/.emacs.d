@@ -1,8 +1,9 @@
-/elpa/*
-/auto-save-list/*
+/auto-save-list/
+/elpa/
+/elisp-objects/
+/semanticdb/
+/server/
 /.sly-mrepl-history
 /recentf
-/server/*
 /.emacs.desktop
 /.emacs.desktop.lock
-
