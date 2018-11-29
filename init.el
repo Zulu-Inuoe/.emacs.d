@@ -102,7 +102,6 @@
     (nyan-mode)))
 
 (use-package elcord
-  :ensure t
   :config
   (progn
     (elcord-mode)))
