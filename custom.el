@@ -14,9 +14,8 @@
      (c++-mode . "stroustrup")
      (java-mode . "java")
      (awk-mode . "awk"))))
- '(clution-frontend (quote roswell))
- '(clution-mode nil)
  '(clution-run-style (quote term))
+ '(column-number-mode t)
  '(company-idle-delay nil)
  '(cperl-close-paren-offset -4)
  '(cperl-continued-statement-offset 4)
@@ -40,8 +39,12 @@
  '(global-hl-line-mode t)
  '(helm-boring-buffer-regexp-list
    (quote
-    ("\\*helm" "\\*Echo Area" "\\*Minibuf" "\\*Help.*" "\\*sly-inferior" "\\*sly-events")))
+    ("\\*Buffer List" "\\*sly-events" "\\*Help" "\\*sly-inferior-lisp" "\\` " "\\`\\*helm" "\\`\\*Echo Area" "\\`\\*Minibuf")))
+ '(helm-buffers-fuzzy-matching t)
+ '(helm-ff-file-name-history-use-recentf t)
  '(helm-ff-skip-boring-files t)
+ '(helm-move-to-line-cycle-in-source t)
+ '(helm-recentf-fuzzy-match t)
  '(ido-ignore-buffers
    (quote
     ("\\*Pp Eval Output\\*" "\\*pu-dummy" "\\` " "\\*slime-compilation\\*" "\\*slime-events\\*" "\\*inferior-lisp\\*" "\\*Fuzzy Completions\\*" "\\*Completions\\*")))
@@ -78,29 +81,15 @@
    (quote
     (markdown-mode avy helm-swoop helm-ag helm-rg smart-mode-line-powerline-theme powerline solaire-mode doom-themes sly-named-readtables sly-repl-ansi-color sly-quicklisp sly-macrostep sly elcord csharp-mode adoc-mode rg neotree magit paredit helm-purpose with-editor helm-company helm elisp-slime-nav company-quickhelp company rainbow-delimiters window-purpose nyan-mode zenburn-theme diminish use-package)))
  '(pop-up-frames nil)
- '(purpose-preferred-prompt (quote helm) t)
- '(purpose-user-mode-purposes nil)
- '(purpose-user-name-purposes
-   (quote
-    (("*slime-compilation*" . lisp-status)
-     ("*slime-error*" . lisp-status)
-     ("*slime-xref*" . lisp-status)
-     ("*slime-repl sbcl*" . lisp-repl)
-     ("*slime-inspector*" . lisp-inspector)
-     ("*slime-macroexpansion*" . lisp-inspector)
-     ("*slime-threads*" . lisp-status)
-     ("*slime-description*" . lisp-inspector)
-     ("*slime-browser*" . lisp-inspector))))
- '(purpose-user-regexp-purposes
-   (quote
-    (("\\*sldb.*" . lisp-status)
-     ("\\*ag search.*" . search-results)
-     ("\\*rg.*" . search-results))))
  '(read-file-name-completion-ignore-case t)
+ '(recentf-auto-cleanup (quote never))
+ '(recentf-mode t)
+ '(rg-executable "rg")
  '(rg-group-result nil)
  '(scroll-bar-mode nil)
  '(scroll-conservatively 101)
  '(scroll-step 1)
+ '(semantic-mode t)
  '(show-trailing-whitespace t)
  '(sly-command-switch-to-existing-lisp (quote (quote always)))
  '(sly-ignore-protocol-mismatches t)
@@ -110,11 +99,15 @@
  '(smooth-scroll-margin 4)
  '(smooth-scrolling-mode nil)
  '(tool-bar-mode nil)
+ '(truncate-lines t)
  '(use-dialog-box nil)
  '(use-file-dialog nil)
  '(user-full-name "Wilfredo Velázquez-Rodríguez")
  '(user-mail-address "zulu.inuoe@gmail.com")
  '(version-control t)
+ '(whitespace-style
+   (quote
+    (face trailing tabs spaces newline empty indentation space-after-tab space-before-tab space-mark tab-mark newline-mark)))
  '(x-select-request-type (quote (UTF8_STRING COMPOUND_TEXT TEXT STRING))))
 
 (custom-set-faces

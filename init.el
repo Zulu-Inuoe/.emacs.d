@@ -6,15 +6,18 @@
 ;;But only turn on for graphic displays. Otherwise a daemon will be stuck
 (setq debug-on-error (display-graphic-p))
 
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(prefer-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+(set-terminal-coding-system 'utf-8-unix)
+(set-keyboard-coding-system 'utf-8-unix)
+
+(defun my/add-load-if-exists (path)
+  (let ((dpath (file-name-as-directory path)))
+    (when (file-exists-p dpath)
+      (add-to-list 'load-path path))))
 
 ;; keep customize settings in their own file
 (setq custom-file "~/.emacs.d/custom.el")
-
-(setq-default buffer-file-coding-system 'utf-8-unix)
-(setq-default default-buffer-file-coding-system 'utf-8-unix)
-(set-default-coding-systems 'utf-8-unix)
-(prefer-coding-system 'utf-8-unix)
 
 (load custom-file t)
 
@@ -35,6 +38,11 @@
 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
+
+(my/add-load-if-exists "~/.emacs.d/lisp/")
+
+;; Sly hacking
+(my/add-load-if-exists "~/code/sly/")
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -57,8 +65,6 @@
 
 ;; Set to t to debug package loading
 (setq use-package-verbose nil)
-
-(desktop-save-mode 1)
 
 (unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
   (package-install 'doom-themes))
@@ -166,6 +172,12 @@
 
 ;; (use-package bs)
 
+(use-package whitespace
+  :diminish global-whitespace-mode
+  :config
+  (progn
+    (global-whitespace-mode)))
+
 (use-package rainbow-delimiters
   :ensure t
   :config
@@ -189,7 +201,7 @@
   :bind
   (:map company-mode-map
         ("<tab>" . company-indent-or-complete-common)
-   :map company-active-map
+        :map company-active-map
         ("C-n" . company-select-next)
         ("C-p" . company-select-previous)
         ("C-d" . company-show-doc-buffer)
@@ -218,7 +230,15 @@
   :defer nil
   :diminish helm-mode
   :bind (("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files))
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files)
+         ("C-x C-y" . helm-show-kill-ring)
+         ("C-h SPC" . helm-all-mark-rings)
+         :map helm-map
+         ("<Tab>" . helm-execute-persistent-action)
+         ("C-z" . helm-select-action)
+         :map helm-find-files-map
+         ("C-s" . helm-ff-run-grep-ag))
   :config
   (progn
     (require 'helm-config)
@@ -252,9 +272,17 @@
   :config
   (progn
     (define-key (current-global-map)
-        [remap async-shell-command] 'with-editor-async-shell-command)
+      [remap async-shell-command] 'with-editor-async-shell-command)
     (define-key (current-global-map)
-        [remap shell-command] 'with-editor-shell-command)))
+      [remap shell-command] 'with-editor-shell-command)))
+
+(use-package psession
+  :ensure t
+  :config
+  (progn
+    (psession-mode 1)
+    (psession-savehist-mode 1)
+    (psession-autosave-mode 1)))
 
 ;; (use-package helm-purpose
 ;;   :ensure t
@@ -433,15 +461,23 @@
 
 (use-package csharp-mode
   :ensure t
-  :mode "\\.cs$"
-  :config
-  (setq c-basic-offset 2))
+  :mode "\\.cs$")
 
 (use-package doc-view
   :ensure t
   :bind (:map doc-view-mode-map
               ("M-v" . backward-page)
               ("C-v" . forward-page)))
+
+(defun my/comment-region-if-mark ()
+  (interactive)
+  (if (use-region-p)
+      (comment-region (min (point) (mark)) (max (point) (mark)))
+    (self-insert-command 1)))
+
+(use-package js
+  :bind (:map js-mode-map
+              ("/" . my/comment-region-if-mark)))
 
 (use-package lua-mode
   :ensure t
@@ -635,6 +671,7 @@
 (add-to-list 'auto-mode-alist '("\\.eclrc$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.ros$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.sbclrc$" . lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.slynkrc$" . lisp-mode))
 
 (add-to-list 'auto-mode-alist '("\\.proj$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
