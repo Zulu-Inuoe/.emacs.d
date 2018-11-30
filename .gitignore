@@ -1,6 +1,9 @@
+/.cache/
 /auto-save-list/
 /elpa/
 /elisp-objects/
+/eshell/
+/lisp/
 /semanticdb/
 /server/
 /.sly-mrepl-history
