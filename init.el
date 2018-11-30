@@ -295,6 +295,13 @@
 ;;     (helm-purpose-setup)))
 
 ;;;editing
+(use-package avy
+  :ensure t
+  :bind ("M-g c" . avy-goto-char))
+
+(use-package which-key
+  :ensure t)
+
 (use-package paredit
   :ensure t
   :diminish paredit-mode
