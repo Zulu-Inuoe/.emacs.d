@@ -85,6 +85,9 @@
  ((package-installed-p 'zenburn-theme)
   (load-theme 'zenburn t)))
 
+;; This seems to get default by a load-theme call
+(setq-default buffer-file-coding-system 'utf-8-unix)
+
 ;; (use-package powerline
 ;;   :ensure t
 ;;   :config
@@ -491,6 +494,10 @@
          ("C-S-<down>" . windsize-down)
          ("C-S-<left>" . windsize-left)
          ("C-S-<right>" . windsize-right)))
+
+(use-package powershell
+  :ensure t
+  :mode "\\.ps1$")
 
 (use-package markdown-mode
   :ensure t

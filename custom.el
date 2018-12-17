@@ -79,7 +79,7 @@
  '(nyan-wavy-trail t)
  '(package-selected-packages
    (quote
-    (markdown-mode avy helm-swoop helm-ag helm-rg smart-mode-line-powerline-theme powerline solaire-mode doom-themes sly-named-readtables sly-repl-ansi-color sly-quicklisp sly-macrostep sly elcord csharp-mode adoc-mode rg neotree magit paredit helm-purpose with-editor helm-company helm elisp-slime-nav company-quickhelp company rainbow-delimiters window-purpose nyan-mode zenburn-theme diminish use-package)))
+    (rg minimap sublimity psession windsize move-border powershell guru-mode autodisass-llvm-bitcode autodisass-java-bytecode easy-kill ggtags helm-gtags window-purpose lua-mode markdown-mode helm-swoop helm-ag smart-mode-line-powerline-theme powerline solaire-mode doom-themes sly-quicklisp sly-macrostep sly csharp-mode adoc-mode neotree magit paredit with-editor helm-company helm elisp-slime-nav company-quickhelp company rainbow-delimiters nyan-mode zenburn-theme diminish use-package)))
  '(pop-up-frames nil)
  '(read-file-name-completion-ignore-case t)
  '(recentf-auto-cleanup (quote never))
