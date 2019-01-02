@@ -2,16 +2,20 @@
 
 (require 'cl)
 
-;;Turn on debugging so I can fix any init breakage. Turns off at the end
-;;But only turn on for graphic displays. Otherwise a daemon will be stuck
+;; Turn on debugging so I can fix any init breakage. Turns off at the end
+;; But only turn on for graphic displays. Otherwise a daemon will be stuck
 (setq debug-on-error (display-graphic-p))
 
+;; Excessive, but what else can I do?
 (setq-default buffer-file-coding-system 'utf-8-unix)
 (setq-default default-buffer-file-coding-system 'utf-8-unix)
+(setq default-buffer-file-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
+(setq-default buffer-file-coding-system 'utf-8-unix)
+(setq-default x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
 (defun my/add-load-if-exists (path)
   (let ((dpath (file-name-as-directory path)))
@@ -23,15 +27,65 @@
 
 (load custom-file t)
 
-;; Tell emacs where central backup directory is, and turn it on
-;; Save all tempfiles in $TMPDIR/emacs$UID/
-(let ((emacs-tmp-dir
-       (format "%s%s/" temporary-file-directory "emacs")))
-  (setq backup-directory-alist
-        `((".*" . ,(concat emacs-tmp-dir "backups/"))))
-  (setq auto-save-file-name-transforms
-        `((".*" ,(concat emacs-tmp-dir "auto-saves/") t)))
-  (setq auto-save-list-file-prefix (concat emacs-tmp-dir "auto-saves/")))
+(require 'recentf)
+
+;; Backup and auto-save settings
+(let* ((emacs-tmp-dir
+        (file-name-as-directory
+         (expand-file-name "emacs" temporary-file-directory)))
+       (backups-dir
+        (file-name-as-directory
+         (expand-file-name "backups" emacs-tmp-dir)))
+       (auto-saves-dir
+        (file-name-as-directory
+         (expand-file-name "auto-saves" emacs-tmp-dir)))
+       (recentf-file
+        (expand-file-name "recentf" emacs-tmp-dir)))
+  (setq-default
+   version-control t
+   delete-old-versions t
+   kept-new-versions 6
+   create-lockfiles nil
+   backup-by-copying t
+   backup-directory-alist `((".*" . ,backups-dir))
+   auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
+   auto-save-list-file-prefix auto-saves-dir
+   recentf-auto-cleanup 'never
+   recentf-save-file recentf-file))
+
+(global-auto-revert-mode +1)
+(recentf-mode +1)
+
+;; Minor visual/input stuff
+(setq-default
+ inhibit-startup-screen t
+ make-pointer-invisible nil
+ echo-keystrokes 0.1
+ frame-resize-pixelwise t
+ eldoc-echo-area-use-multiline-p t
+ read-file-name-completion-ignore-case t
+ find-file-visit-truename nil
+ mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control)))
+ cursor-in-non-selected-windows nil
+ scroll-conservatively 101
+ scroll-step 1
+ truncate-lines t)
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(column-number-mode +1)
+(global-hl-line-mode +1)
+
+;; Misc
+
+;; Basic editing settings
+(setq-default
+ indent-tabs-mode nil
+ indicate-empty-lines t
+ mode-require-final-newline nil
+ mouse-yank-at-point t
+ show-trailing-whitespace t)
 
 ;;;; Set up package management info
 
@@ -68,6 +122,9 @@
 ;; Set to t to debug package loading
 (setq use-package-verbose nil)
 
+;; Theme
+(setq-default custom-safe-themes t)
+
 (unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
   (package-install 'doom-themes))
 
@@ -85,29 +142,26 @@
  ((package-installed-p 'zenburn-theme)
   (load-theme 'zenburn t)))
 
-;; This seems to get default by a load-theme call
 (setq-default buffer-file-coding-system 'utf-8-unix)
 
-;; (use-package powerline
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (set-face-attribute 'mode-line nil
-;;                     :foreground "Black"
-;;                     :background "DarkOrange"
-;;                     :box nil)
-;;     (setq powerline-arrow-shape 'curve)))
+(use-package clution
+  :if (require 'clution nil t)
+  :custom
+  (clution-run-style 'term))
 
 (use-package nyan-mode
   :ensure t
+  :custom
+  (nyan-animate-nyancat t)
+  (nyan-bar-length 20)
+  (nyan-mode nil)
+  (nyan-wavy-trail t)
   :config
-  (progn
-    (nyan-mode)))
+  (nyan-mode +1))
 
 (use-package elcord
   :config
-  (progn
-    (elcord-mode)))
+  (elcord-mode))
 
 ;; (use-package window-purpose
 ;;   :ensure t
@@ -178,24 +232,25 @@
 
 (use-package whitespace
   :diminish global-whitespace-mode
+  :custom
+  (whitespace-style
+   '(face trailing tabs spaces newline empty indentation space-after-tab
+          space-before-tab space-mark tab-mark newline-mark))
   :config
-  (progn
-    (global-whitespace-mode)))
+  (global-whitespace-mode +1))
 
 (use-package rainbow-delimiters
   :ensure t
   :config
-  (progn
-    (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode-enable)
-    (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode-enable)))
+  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode-enable)
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode-enable))
 
 (use-package solaire-mode
   :ensure t
   :hook ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   :config
-  (progn
-    (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
-    (solaire-mode-swap-bg)))
+  (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
+  (solaire-mode-swap-bg))
 
 ;;;completion & input
 (use-package company
@@ -206,23 +261,29 @@
   (:map company-mode-map
         ("<tab>" . company-indent-or-complete-common)
         :map company-active-map
+        ("<prior>" . company-previous-page)
+        ("<next>" . company-next-page)
+        ("<down>" . company-select-next)
+        ("<up>" . company-select-previous)
         ("C-n" . company-select-next)
         ("C-p" . company-select-previous)
         ("C-d" . company-show-doc-buffer)
         ("M-." . company-show-location)
-        ("<tab>" . company-select-next)
-        ("C-<tab>" . company-select-previous)
-        ("RET" . company-complete-selection))
+        ("SPC" . my/company-abort-and-insert))
+  :custom
+  (company-idle-delay 0)
+  (company-require-match nil)
   :config
-  (progn
-    (company-tng-configure-default)
-    (add-hook 'after-init-hook 'global-company-mode)))
+  (defun my/company-abort-and-insert ()
+    (interactive)
+    (company-abort)
+    (self-insert-command 1))
+  (add-hook 'after-init-hook 'global-company-mode))
 
-(use-package company-quickhelp
-  :ensure t
-  :config
-  (progn
-    (add-hook 'after-init-hook 'company-quickhelp-mode)))
+;; (use-package company-quickhelp
+;;   :ensure t
+;;   :config
+;;   (add-hook 'after-init-hook 'company-quickhelp-mode))
 
 (use-package elisp-slime-nav
   :ensure t
@@ -242,13 +303,29 @@
          ("<Tab>" . helm-execute-persistent-action)
          ("C-z" . helm-select-action)
          :map helm-find-files-map
-         ("C-s" . helm-ff-run-grep-ag))
+         ("C-s" . helm-ff-run-grep-ag)
+         :map helm-buffer-map
+         ("<tab>" . helm-next-source)
+         ("S-<tab>" . helm-previous-source)
+         :map helm-generic-files-map
+         ("<tab>" . helm-next-source)
+         ("S-<tab>" . helm-previous-source))
+  :custom
+  (helm-boring-buffer-regexp-list
+   '("\\*Buffer List" "\\*sly-events" "\\*Help" "\\*sly-inferior-lisp" "\\` " "\\`\\*helm" "\\`\\*Echo Area" "\\`\\*Minibuf"))
+  (helm-buffers-fuzzy-matching t)
+  (helm-ff-file-name-history-use-recentf t)
+  (helm-ff-skip-boring-files t)
+  (helm-grep-ag-command
+   "rg --color=always --smart-case --no-heading --line-number %s %s %s")
+  (helm-move-to-line-cycle-in-source t)
+  (helm-recentf-fuzzy-match t)
   :config
-  (progn
-    (require 'helm-config)
-    (helm-mode t)))
+  (require 'helm-config)
+  (helm-mode +1))
 
 (use-package helm-swoop
+  :after (helm)
   :ensure t
   :bind (("M-i" . helm-swoop)
          ("M-I" . helm-swoop-back-to-last-point)
@@ -259,6 +336,7 @@
          ("C-r" . helm-previous-line)))
 
 (use-package helm-company
+  :after (helm)
   :ensure t
   :defer nil
   :bind (:map company-mode-map
@@ -274,19 +352,17 @@
   :hook (term-exec . with-editor-export-editor)
   :hook (eshell-mode . with-editor-export-editor)
   :config
-  (progn
-    (define-key (current-global-map)
-      [remap async-shell-command] 'with-editor-async-shell-command)
-    (define-key (current-global-map)
-      [remap shell-command] 'with-editor-shell-command)))
+  (define-key (current-global-map)
+    [remap async-shell-command] 'with-editor-async-shell-command)
+  (define-key (current-global-map)
+    [remap shell-command] 'with-editor-shell-command))
 
 (use-package psession
   :ensure t
   :config
-  (progn
-    (psession-mode 1)
-    (psession-savehist-mode 1)
-    (psession-autosave-mode 1)))
+  (psession-mode +1)
+  (psession-savehist-mode +1)
+  (psession-autosave-mode +1))
 
 ;; (use-package helm-purpose
 ;;   :ensure t
@@ -300,80 +376,78 @@
   :bind ("M-g c" . avy-goto-char))
 
 (use-package which-key
-  :ensure t)
+  :ensure t
+  :defer nil
+  :config (which-key-mode +1))
+
+(use-package windsize
+  :ensure t
+  :bind (("C-S-<up>" . windsize-up)
+         ("C-S-<down>" . windsize-down)
+         ("C-S-<left>" . windsize-left)
+         ("C-S-<right>" . windsize-right)))
 
 (use-package paredit
   :ensure t
   :diminish paredit-mode
   :config
-  (progn
-    (defun my/paredit-delete-region-or-forward ()
-      (interactive)
-      (if (use-region-p)
-          (paredit-delete-region (region-beginning) (region-end))
-        (paredit-forward-delete)))
+  (defun my/paredit-delete-region-or-forward ()
+    (interactive)
+    (if (use-region-p)
+        (paredit-delete-region (region-beginning) (region-end))
+      (paredit-forward-delete)))
 
-    (defun my/paredit-delete-region-or-backward ()
-      (interactive)
-      (if (use-region-p)
-          (paredit-delete-region (region-beginning) (region-end))
-        (paredit-backward-delete)))
+  (defun my/paredit-delete-region-or-backward ()
+    (interactive)
+    (if (use-region-p)
+        (paredit-delete-region (region-beginning) (region-end))
+      (paredit-backward-delete)))
 
-    (defun my/paredit-kill-region-or-kill ()
-      (interactive)
-      (if (use-region-p)
-          (paredit-kill-region (region-beginning) (region-end))
-        (paredit-kill)))
+  (defun my/paredit-kill-region-or-kill ()
+    (interactive)
+    (if (use-region-p)
+        (paredit-kill-region (region-beginning) (region-end))
+      (paredit-kill)))
 
-    (defun my/paredit-comment-sexp ()
-      "Comment out the sexp at point."
-      (interactive)
+  (defun my/paredit-comment-sexp ()
+    "Comment out the sexp at point."
+    (interactive)
+    (save-excursion
+      (mark-sexp)
+      (paredit-comment-dwim)))
+
+  (defun my/paredit-comment-line-or-sexp ()
+    (interactive)
+    (cond
+     ((use-region-p)
       (save-excursion
-        (mark-sexp)
+        (mark-sexp 1 t)
         (paredit-comment-dwim)))
+     ((or (paredit-in-string-p)
+          (paredit-in-comment-p)
+          (paredit-in-char-p)
+          (looking-at "[[:space:]]*$")
+          (looking-at "[[:space:]]*;+.*$"))
+      (paredit-semicolon))
+     ((looking-at "[[:space:]]*(.*$")
+      (my/paredit-comment-sexp))
+     (t
+      (paredit-semicolon))))
 
-    (defun my/paredit-comment-line-or-sexp ()
-      (interactive)
-      (cond
-       ((use-region-p)
-        (save-excursion
-          (mark-sexp 1 t)
-          (paredit-comment-dwim)))
-       ((or (paredit-in-string-p)
-            (paredit-in-comment-p)
-            (paredit-in-char-p)
-            (looking-at "[[:space:]]*$")
-            (looking-at "[[:space:]]*;+.*$"))
-        (paredit-semicolon))
-       ((looking-at "[[:space:]]*(.*$")
-        (my/paredit-comment-sexp))
-       (t
-        (paredit-semicolon))))
+  (when (package-installed-p 'eldoc)
+    (eldoc-add-command
+     'paredit-backward-delete
+     'paredit-close-round))
 
-    (when (package-installed-p 'eldoc)
-      (eldoc-add-command
-       'paredit-backward-delete
-       'paredit-close-round))
+  (define-key paredit-mode-map [remap paredit-semicolon] 'my/paredit-comment-line-or-sexp)
+  (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
+  (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
+  (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill)
 
-    (define-key paredit-mode-map [remap paredit-semicolon] 'my/paredit-comment-line-or-sexp)
-    (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
-    (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
-    (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill)
-
-    (add-hook 'lisp-mode-hook 'paredit-mode)
-    (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-    (when (package-installed-p 'sly)
-      (add-hook 'sly-mode-hook 'paredit-mode))))
-
-;; (use-package projectile
-;;   :ensure t
-;;   :defer nil
-;;   :bind (:map projectile-mode-map
-;;               ("s-p" . 'projectile-command-map)
-;;               ("C-c p" . 'projectile-command-map))
-;;   :config
-;;   (progn
-;;     (projectile-mode +1)))
+  (add-hook 'lisp-mode-hook 'paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+  (when (package-installed-p 'sly)
+    (add-hook 'sly-mode-hook 'paredit-mode)))
 
 (when (executable-find "git")
   (use-package magit
@@ -383,58 +457,70 @@
                 :map magit-diff-mode-map
                 ("<C-tab>" . 'my/next-window-or-buffer))
     :defer t
+    :custom (magit-set-upstream-on-push 'dontask)
     :init
-    (progn
-      ;;Tell's git to use the TK GUI to ask for password
-      ;;This is a workaround to a problem with git when pushing
-      ;;over https
-      (setenv "GIT_ASKPASS" "git-gui--askpass"))))
+    ;;Tell's git to use the TK GUI to ask for password
+    ;;This is a workaround to a problem with git when pushing
+    ;;over https
+    (setenv "GIT_ASKPASS" "git-gui--askpass")))
 
 (use-package neotree
-  :if (package-installed-p 'neotree)
-  :bind (:map neotree-mode-map
-              ("M-l" . my/neotree-go-up)
-              ("C-z" . my/neotree-go-down))
+  :ensure t
+  :bind (([f8] . neotree-toggle)
+         :map neotree-mode-map
+              ("C-l" . my/neotree-go-up)
+              ("C-j" . my/neotree-go-down))
+  :custom
+  (neo-dont-be-alone t)
+  (neo-hidden-regexp-list
+   '("^\\." "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.fasl$"))
+  (neo-smart-open t)
+  (neo-theme 'nerd)
   :config
-  (progn
-    (global-set-key [f8] 'neotree-toggle)
+  (defun my/neotree-go-down ()
+    (interactive)
+    (let ((dst (neo-buffer--get-filename-current-line)))
+      (when (file-directory-p dst)
+        (neo-global--open-dir dst))))
 
-    (defun my/neotree-go-down ()
-      (interactive)
-      (let ((dst (neo-buffer--get-filename-current-line)))
-        (when (file-directory-p dst)
-          (neo-global--open-dir dst))))
+  (defun my/neotree-go-up ()
+    (interactive)
+    (let ((prev-root (file-name-as-directory neo-buffer--start-node))
+          (new-root (file-name-directory (directory-file-name neo-buffer--start-node))))
+      (message "Prev-root: %s" prev-root)
+      (message "New root: %s" new-root)
+      (neo-global--open-dir new-root)
+      (neotree-find prev-root)))
 
-    (defun my/neotree-go-up ()
-      (interactive)
-      (let ((prev-root neo-buffer--start-node)
-            (new-root (file-name-directory(directory-file-name neo-buffer--start-node))))
-        (neo-global--open-dir new-root)
-        (neotree-find prev-root)))
+  (defun my/select-neotree-file (file)
+    (when (and file
+               (neo-global--window-exists-p)
+               (neo-global--file-in-root-p file))
+      (with-selected-window (selected-window)
+        (neotree-find file))))
 
-    (defun my/select-neotree-file (file)
-      (when (and file
-                 (neo-global--window-exists-p)
-                 (neo-global--file-in-root-p file))
-        (with-selected-window (selected-window)
-          (neotree-find file))))
-
-    (defadvice switch-to-buffer (after update-neotree-advice
-                                       (buffer-or-name
-                                        &optional
-                                        norecord force-same-window) activate)
-      (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
-
-    (defadvice display-buffer (after update-neotree-advice
+  (defadvice switch-to-buffer (after update-neotree-advice
                                      (buffer-or-name
-                                      &optional action frame) activate)
-      (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))))
+                                      &optional
+                                      norecord force-same-window) activate)
+    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
+
+  (defadvice display-buffer (after update-neotree-advice
+                                   (buffer-or-name
+                                    &optional action frame) activate)
+    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name)))))
 
 (use-package rg
   :if (executable-find "rg")
-  :ensure t)
+  :ensure t
+  :custom
+  (rg-group-result nil))
 
 ;;; passive tools
+
+(use-package doc-view
+  :custom
+  (doc-view-ghostscript-program "gswin64c"))
 
 ;;; languages & editing
 
@@ -447,6 +533,14 @@
 (use-package antlr-mode
   :ensure t
   :mode "\\.g4$")
+
+(use-package cc-mode
+  :custom
+  (c-default-style
+   '((c-mode . "stroustrup")
+     (c++-mode . "stroustrup")
+     (java-mode . "java")
+     (awk-mode . "awk"))))
 
 (use-package ggtags
   :ensure t
@@ -463,12 +557,17 @@
   (add-hook 'c-mode-common-hook
             #'(lambda ()
                 (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                  (ggtags-mode 1)))))
+                  (ggtags-mode +1)))))
 
 (use-package cperl-mode
   :ensure t
   :mode "\\.pl$"
-  :mode "\\.perl$")
+  :mode "\\.perl$"
+  :custom
+  (cperl-close-paren-offset -4)
+  (cperl-continued-statement-offset 4)
+  (cperl-indent-level 4)
+  (cperl-indent-parens-as-block t))
 
 (use-package csharp-mode
   :ensure t
@@ -488,19 +587,19 @@
 
 (use-package js
   :bind (:map js-mode-map
-              ("/" . my/comment-region-if-mark)))
+              ("/" . my/comment-region-if-mark))
+  :custom (js-indent-level 2))
 
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
-  :interpreter "lua")
+  :interpreter "lua"
+  :custom (lua-indent-level 4))
 
-(use-package windsize
-  :ensure t
-  :bind (("C-S-<up>" . windsize-up)
-         ("C-S-<down>" . windsize-down)
-         ("C-S-<left>" . windsize-left)
-         ("C-S-<right>" . windsize-right)))
+(use-package nxml-mode
+  :custom
+  (nxml-attribute-indent 2)
+  (nxml-slash-auto-complete-flag t))
 
 (use-package powershell
   :ensure t
@@ -511,26 +610,31 @@
   :mode "\\.text$"
   :mode "\\.markdown$"
   :mode "\\.md$"
-  :mode ("README\\.md$" . gfm-mode))
+  :mode ("README\\.md$" . gfm-mode)
+  :custom (markdown-command "pandoc"))
 
 (use-package sly
-  :if (package-installed-p 'sly)
+;  :if (package-installed-p 'sly)
+  :custom
+  (inferior-lisp-program "sbcl")
+  (sly-command-switch-to-existing-lisp 'always)
+  (sly-ignore-protocol-mismatches t)
+  (sly-kill-without-query-p t)
+  (sly-mrepl-history-file-name "~/.emacs.d/.sly-mrepl-history")
+  (sly-net-coding-system 'utf-8-unix)
   :config
-  (progn
-    (defun kill-sly-buffers ()
-      (interactive)
-      (mapc
-       (lambda (buffer)
-         (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
-                   (eql (string-match " \\*sly" (buffer-name buffer)) 0))
-           (kill-buffer buffer)))
-       (buffer-list)))))
+  (defun kill-sly-buffers ()
+    (interactive)
+    (mapc
+     (lambda (buffer)
+       (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
+                 (eql (string-match " \\*sly" (buffer-name buffer)) 0))
+         (kill-buffer buffer)))
+     (buffer-list))))
 
 (use-package slime
   :if (package-installed-p 'slime)
-  :config
-  (progn
-    (setq slime-contribs '(slime-fancy))))
+  :custom (slime-contribs '(slime-fancy)))
 
 ;; automatic disassembly
 (use-package autodisass-java-bytecode   ; auto-disassemble Java bytecode
@@ -547,6 +651,7 @@
 (put 'erase-buffer 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'list-timers 'disabled nil)
 
 ;; Frame title bar formatting to show full path of file
 (setq-default
@@ -692,5 +797,5 @@
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.mtl$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xaml$" . nxml-mode))
-(put 'list-timers 'disabled nil)
+
 (setq debug-on-error nil)
