@@ -144,6 +144,8 @@
 
 (setq-default buffer-file-coding-system 'utf-8-unix)
 
+(load "local.el" t nil t t)
+
 (use-package clution
   :if (require 'clution nil t)
   :custom
