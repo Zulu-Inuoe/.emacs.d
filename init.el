@@ -22,6 +22,9 @@
     (when (file-exists-p dpath)
       (add-to-list 'load-path path))))
 
+(defun my/disable-show-trailing-whitespace ()
+  (setq show-trailing-whitespace nil))
+
 ;; keep customize settings in their own file
 (setq custom-file "~/.emacs.d/custom.el")
 
@@ -165,6 +168,11 @@
   :config
   (elcord-mode))
 
+(use-package sunshine
+  :if (package-installed-p 'sunshine)
+  :hook (sunshine-mode . my/disable-show-trailing-whitespace)
+  :custom (sunshine-show-icons (display-graphic-p)))
+
 ;; (use-package window-purpose
 ;;   :ensure t
 ;;   :bind (:map purpose-mode-map
@@ -230,8 +238,6 @@
 ;; ;;     (purpose-x-kill-setup)
 ;; ;;     (purpose-x-magit-single-on)))
 
-;; (use-package bs)
-
 (use-package whitespace
   :diminish global-whitespace-mode
   :custom
@@ -258,7 +264,6 @@
 (use-package company
   :ensure t
   :defer nil
-  :diminish company-mode
   :bind
   (:map company-mode-map
         ("<tab>" . company-indent-or-complete-common)
@@ -380,6 +385,7 @@
 (use-package which-key
   :ensure t
   :defer nil
+  :diminish which-key-mode
   :config (which-key-mode +1))
 
 (use-package windsize
@@ -465,6 +471,18 @@
     ;;This is a workaround to a problem with git when pushing
     ;;over https
     (setenv "GIT_ASKPASS" "git-gui--askpass")))
+
+(use-package gitattributes-mode
+  :ensure t
+  :mode "^\\.gitattributes$")
+
+(use-package gitignore-mode
+  :ensure t
+  :mode "^\\.gitignore$")
+
+(use-package gitconfig-mode
+  :ensure t
+  :mode "^\\.gitconfig$")
 
 (use-package neotree
   :ensure t
@@ -778,6 +796,7 @@
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
 
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+(diminish 'eldoc-mode)
 
 ;;Prettify symbols
 (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)

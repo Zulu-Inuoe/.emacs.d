@@ -9,7 +9,10 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (neotree sly autodisass-llvm-bitcode autodisass-java-bytecode markdown-mode windsize lua-mode csharp-mode ggtags adoc-mode rg magit paredit which-key avy psession with-editor helm-company helm-swoop helm elisp-slime-nav company-quickhelp company solaire-mode rainbow-delimiters nyan-mode doom-themes diminish use-package)))
+    (gitconfig-mode gitattributes-mode gitignore-mode json-mode sunshine powershell neotree sly autodisass-llvm-bitcode autodisass-java-bytecode markdown-mode windsize lua-mode csharp-mode ggtags adoc-mode rg magit paredit which-key avy psession with-editor helm-company helm-swoop helm elisp-slime-nav company-quickhelp company solaire-mode rainbow-delimiters nyan-mode doom-themes diminish use-package)))
+ '(sunshine-appid "b68ddcdc114f28b8c1f9af7aa9a8f92d")
+ '(sunshine-location "Orlando, US")
+ '(sunshine-show-icons nil t nil "Customized with use-package sunshine")
  '(user-full-name "Wilfredo Velázquez-Rodríguez")
  '(user-mail-address "zulu.inuoe@gmail.com"))
 
