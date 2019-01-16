@@ -623,7 +623,7 @@
 
 (use-package powershell
   :ensure t
-  :mode "\\.ps1$")
+  :mode ("\\.ps1$" . powershell-mode))
 
 (use-package markdown-mode
   :ensure t
