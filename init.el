@@ -455,15 +455,21 @@
     (add-hook 'sly-mode-hook 'paredit-mode)))
 
 (when (executable-find "git")
+  (use-package ssh-agency
+    :ensure t
+    :defer t)
+
   (use-package magit
     :ensure t
     :defer t
+    :after ssh-agency
     :custom (magit-set-upstream-on-push 'dontask)
     :init
     ;;Tell's git to use the TK GUI to ask for password
     ;;This is a workaround to a problem with git when pushing
     ;;over https
-    (setenv "GIT_ASKPASS" "git-gui--askpass")))
+    (setenv "GIT_ASKPASS" "git-gui--askpass")
+    (setenv "SSH_ASKPASS" "git-gui--askpass")))
 
 (use-package gitattributes-mode
   :ensure t
