@@ -655,6 +655,13 @@
   :if (package-installed-p 'slime)
   :custom (slime-contribs '(slime-fancy)))
 
+(use-package omnisharp
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-omnisharp)
+  (add-hook 'csharp-mode-hook 'omnisharp-mode))
+
 ;; automatic disassembly
 (use-package autodisass-java-bytecode   ; auto-disassemble Java bytecode
   :ensure t)
