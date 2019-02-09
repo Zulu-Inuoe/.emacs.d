@@ -374,9 +374,7 @@
   (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill)
 
   (add-hook 'lisp-mode-hook 'paredit-mode)
-  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-  (when (package-installed-p 'sly)
-    (add-hook 'sly-mode-hook 'paredit-mode)))
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
 
 (when (executable-find "git")
   (use-package ssh-agency
