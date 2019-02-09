@@ -26,7 +26,7 @@
   (setq show-trailing-whitespace nil))
 
 ;; keep customize settings in their own file
-(setq custom-file "~/.emacs.d/custom.el")
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (load custom-file t)
 
@@ -98,7 +98,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
 
-(my/add-load-if-exists "~/.emacs.d/lisp/")
+(my/add-load-if-exists (expand-file-name "lisp/" user-emacs-directory))
 
 ;; Sly hacking
 (my/add-load-if-exists "~/code/sly/")
@@ -633,7 +633,7 @@
   (sly-command-switch-to-existing-lisp 'always)
   (sly-ignore-protocol-mismatches t)
   (sly-kill-without-query-p t)
-  (sly-mrepl-history-file-name "~/.emacs.d/.sly-mrepl-history")
+  (sly-mrepl-history-file-name (expand-file-name ".sly-mrepl-history" user-emacs-directory))
   (sly-net-coding-system 'utf-8-unix)
   :config
   (defun kill-sly-buffers ()
