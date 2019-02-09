@@ -145,6 +145,7 @@
  ((package-installed-p 'zenburn-theme)
   (load-theme 'zenburn t)))
 
+;; Doom will for whatever reason reset the buffer coding system..
 (setq-default buffer-file-coding-system 'utf-8-unix)
 
 (load "local.el" t nil t t)
