@@ -263,6 +263,7 @@
 ;;;completion & input
 (use-package company
   :ensure t
+  :diminish company-mode
   :defer nil
   :bind
   (:map company-mode-map
@@ -285,12 +286,7 @@
     (interactive)
     (company-abort)
     (self-insert-command 1))
-  (add-hook 'after-init-hook 'global-company-mode))
-
-;; (use-package company-quickhelp
-;;   :ensure t
-;;   :config
-;;   (add-hook 'after-init-hook 'company-quickhelp-mode))
+  (global-company-mode 1))
 
 (use-package elisp-slime-nav
   :ensure t
