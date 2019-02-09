@@ -456,10 +456,6 @@
 (when (executable-find "git")
   (use-package magit
     :ensure t
-    :bind (:map magit-status-mode-map
-                ("<C-tab>" . 'my/next-window-or-buffer)
-                :map magit-diff-mode-map
-                ("<C-tab>" . 'my/next-window-or-buffer))
     :defer t
     :custom (magit-set-upstream-on-push 'dontask)
     :init
@@ -686,10 +682,6 @@
                                   dired-directory
                                   (revert-buffer-function " %b" ("%b - Dir:  " default-directory)))))))
 
-(defun explorer ()
-  (interactive)
-  (async-shell-command (format "explorer \"%s\"" (subst-char-in-string ?/ ?\\ default-directory)) 0))
-
 (defun my/kill-current-buffer ()
   (interactive)
   (kill-buffer (current-buffer)))
@@ -731,22 +723,6 @@
       (kill-region (region-beginning) (region-end))
     (kill-word arg)))
 
-(defun my/next-window-or-buffer ()
-  (interactive)
-  (cond
-   ((cdr (window-list)) ; more than one window
-    (other-window 1))
-   (t
-    (switch-to-buffer (other-buffer)))))
-
-(defun my/prev-window-or-buffer ()
-  (interactive)
-  (cond
-   ((cdr (window-list))
-    (other-window -1))
-   (t
-    (switch-to-buffer (other-buffer)))))
-
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
@@ -764,9 +740,8 @@
           (set-buffer-modified-p nil))))))
 
 ;;;; Global key bindings
+(global-set-key (kbd "<M-f4>") 'delete-frame)
 (global-set-key (kbd "<C-f4>") 'my/kill-current-buffer)
-(global-set-key (kbd "C-x C-k") 'my/kill-current-buffer)
-(global-set-key (kbd "C-x k") 'kill-buffer)
 
 (global-set-key [remap delete-char] 'my/delete-region-or-char)
 (global-set-key [remap delete-forward-char] 'my/delete-region-or-char)
@@ -775,11 +750,6 @@
 (global-set-key [remap kill-line] 'my/kill-region-or-kill-line)
 (global-set-key [remap kill-word] 'my/kill-region-or-kill-word)
 
-(global-set-key (kbd "<C-tab>") 'my/next-window-or-buffer)
-(global-set-key (kbd "<C-S-tab>") 'my/prev-window-or-buffer)
-
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
