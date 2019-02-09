@@ -663,7 +663,8 @@
   :ensure t)
 
 (when (eq system-type 'windows-nt)
-  (set-message-beep 'silent))
+  (set-message-beep 'silent)
+  (define-coding-system-alias 'cp65001 'utf-8))
 
 ;; Replace "yes or no" with y or n
 (defalias 'yes-or-no-p 'y-or-n-p)
