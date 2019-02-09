@@ -174,71 +174,6 @@
   :hook (sunshine-mode . my/disable-show-trailing-whitespace)
   :custom (sunshine-show-icons (display-graphic-p)))
 
-;; (use-package window-purpose
-;;   :ensure t
-;;   :bind (:map purpose-mode-map
-;;               ("C-x C-f" . nil))
-;;   :defer nil
-;;   :config
-;;   (progn
-;;     (purpose-mode t)
-;;     (defun my/display-at-bottom-and-select (buffer alist)
-;;       (let ((window (purpose-display-at-bottom buffer alist)))
-;;         (when window
-;;           (select-window window))
-;;         window))
-
-;;     (defun purpose-display-split-sly-repl-right (buffer alist)
-;;       "Display debugger window on the right side of repl."
-;;       (let ((first-window (cl-find-if
-;;                            (lambda (window)
-;;                              (with-current-buffer (window-buffer window) (eq major-mode 'sly-mrepl-mode)))
-;;                            (window-list))))
-;;         (when first-window
-;;           (let ((new-window (split-window first-window nil 'right)))
-;;             (purpose-change-buffer buffer new-window 'window alist)
-;;             new-window))))
-
-;;     (add-to-list
-;;      'purpose-special-action-sequences
-;;      '(search-results
-;;        purpose-display-reuse-window-purpose
-;;        my/display-at-bottom-and-select))
-
-;;     (add-to-list
-;;      'purpose-special-action-sequences
-;;      '(repl
-;;        purpose-display-reuse-window-buffer
-;;        purpose-display-reuse-window-purpose
-;;        my/display-at-bottom-and-select))
-
-;;     (add-to-list
-;;      'purpose-special-action-sequences
-;;      '(status
-;;        purpose-display-reuse-window-buffer
-;;        purpose-display-reuse-window-purpose
-;;        purpose-display-split-sly-repl-right
-;;        my/display-at-bottom-and-select))
-
-;;     ;; Sly repl
-;;     (add-to-list 'purpose-user-mode-purposes '(sly-mrepl-mode . repl))
-;;     (add-to-list 'purpose-user-regexp-purposes '("\\*sly-mrepl" . repl))
-;;     ;; Sly debugger
-;;     (add-to-list 'purpose-user-mode-purposes '(sly-db-mode . status))
-;;     (add-to-list 'purpose-user-regexp-purposes '("\\*sly-db" . status))
-;;     ;; Sly inspector
-;;     (add-to-list 'purpose-user-mode-purposes '(sly-inspector-mode . status))
-;;     ;; Sly compile file
-;;     (add-to-list 'purpose-user-mode-purposes '(compilation-mode . status))
-;;     (purpose-compile-user-configuration)))
-
-
-;; ;; (use-package window-purpose-x
-;; ;;   :config
-;; ;;   (progn
-;; ;;     (purpose-x-kill-setup)
-;; ;;     (purpose-x-magit-single-on)))
-
 (use-package whitespace
   :diminish global-whitespace-mode
   :custom
@@ -349,17 +284,6 @@
               ("C-:" . helm-company)))
 
 ;;; window/frame layout
-
-(use-package with-editor
-  :ensure t
-  :hook (shell-mode . with-editor-export-editor)
-  :hook (term-exec . with-editor-export-editor)
-  :hook (eshell-mode . with-editor-export-editor)
-  :config
-  (define-key (current-global-map)
-    [remap async-shell-command] 'with-editor-async-shell-command)
-  (define-key (current-global-map)
-    [remap shell-command] 'with-editor-shell-command))
 
 (use-package psession
   :ensure t
@@ -661,13 +585,6 @@
   :config
   (add-to-list 'company-backends 'company-omnisharp)
   (add-hook 'csharp-mode-hook 'omnisharp-mode))
-
-;; automatic disassembly
-(use-package autodisass-java-bytecode   ; auto-disassemble Java bytecode
-  :ensure t)
-
-(use-package autodisass-llvm-bitcode    ; auto-disassemble LLVM bitcode
-  :ensure t)
 
 (when (eq system-type 'windows-nt)
   (set-message-beep 'silent)
