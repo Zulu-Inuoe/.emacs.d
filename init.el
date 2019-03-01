@@ -1,5 +1,4 @@
-;;-*-coding: utf-8-*-
-
+;;-*-coding: utf-8-unix-*-
 (require 'cl)
 
 ;; Turn on debugging so I can fix any init breakage. Turns off at the end
@@ -378,13 +377,12 @@
 
 (when (executable-find "git")
   (use-package ssh-agency
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package magit
     :ensure t
+    :bind ("C-x g" . magit-status)
     :defer t
-    :after ssh-agency
     :custom (magit-set-upstream-on-push 'dontask)
     :init
     ;;Tell's git to use the TK GUI to ask for password
@@ -409,8 +407,8 @@
   :ensure t
   :bind (([f8] . neotree-toggle)
          :map neotree-mode-map
-              ("C-l" . my/neotree-go-up)
-              ("C-j" . my/neotree-go-down))
+         ("C-l" . my/neotree-go-up)
+         ("C-j" . my/neotree-go-down))
   :custom
   (neo-dont-be-alone t)
   (neo-hidden-regexp-list
