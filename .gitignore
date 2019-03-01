@@ -1,9 +1,12 @@
 /.cache/
 /auto-save-list/
+/url/
 /elpa/
 /elisp-objects/
+/emojis/
 /eshell/
 /lisp/
+/var/pcache/
 /semanticdb/
 /server/
 /.sly-mrepl-history
