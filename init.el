@@ -291,6 +291,12 @@
   (psession-savehist-mode +1)
   (psession-autosave-mode +1))
 
+(use-package slack
+  :commands (start-slack)
+  :custom
+  (slack-buffer-enable-emojify t)
+  (slack-prefer-current-team t))
+
 ;; (use-package helm-purpose
 ;;   :ensure t
 ;;   :config
