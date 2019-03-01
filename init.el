@@ -168,11 +168,6 @@
   :config
   (elcord-mode))
 
-(use-package sunshine
-  :if (package-installed-p 'sunshine)
-  :hook (sunshine-mode . my/disable-show-trailing-whitespace)
-  :custom (sunshine-show-icons (display-graphic-p)))
-
 (use-package whitespace
   :diminish global-whitespace-mode
   :custom
@@ -228,6 +223,12 @@
   :diminish elisp-slime-nav-mode
   :hook ((lisp-interaction-mode emacs-lisp-mode) . elisp-slime-nav-mode))
 
+(use-package back-button
+  :ensure t
+  :diminish back-button-mode
+  :bind (("<mouse-4>" . back-button-global-backward)
+         ("<mouse-5>" . back-button-global-forward)))
+
 (use-package helm
   :ensure t
   :defer nil
@@ -274,7 +275,7 @@
          ("C-r" . helm-previous-line)))
 
 (use-package helm-company
-  :after (helm)
+  :after (helm company)
   :ensure t
   :defer nil
   :bind (:map company-mode-map
