@@ -316,13 +316,13 @@ directory too."
                     nil nil nil
                     "-NoProfile"
                     "-ExecutionPolicy" "Bypass"
-                    "-Command" (expand-file-name "install-fonts.ps1" user-emacs-directory)))
+                    "-File" (expand-file-name "install-fonts.ps1" user-emacs-directory)))
     (defun my/uninstall-fonts ()
       (call-process "powershell"
                     nil nil nil
                     "-NoProfile"
                     "-ExecutionPolicy" "Bypass"
-                    "-Command"  (expand-file-name "uninstall-fonts.ps1" user-emacs-directory)))
+                    "-File"  (expand-file-name "uninstall-fonts.ps1" user-emacs-directory)))
 
     (my/install-fonts)
     (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
