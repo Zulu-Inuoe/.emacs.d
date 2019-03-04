@@ -165,6 +165,7 @@
   (nyan-mode +1))
 
 (use-package elcord
+  :if (package-installed-p 'elcord)
   :config
   (elcord-mode))
 
