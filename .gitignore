@@ -9,6 +9,7 @@
 /var/pcache/
 /semanticdb/
 /server/
+/transient/
 /.sly-mrepl-history
 /recentf
 /.emacs.desktop
