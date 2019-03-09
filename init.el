@@ -224,11 +224,12 @@
   :diminish elisp-slime-nav-mode
   :hook ((lisp-interaction-mode emacs-lisp-mode) . elisp-slime-nav-mode))
 
-(use-package back-button
-  :ensure t
-  :diminish back-button-mode
-  :bind (("<mouse-4>" . back-button-global-backward)
-         ("<mouse-5>" . back-button-global-forward)))
+(when (>= emacs-major-version 25)
+  (use-package back-button
+    :ensure t
+    :diminish back-button-mode
+    :bind (("<mouse-4>" . back-button-global-backward)
+           ("<mouse-5>" . back-button-global-forward))))
 
 (use-package helm
   :ensure t
@@ -327,12 +328,14 @@ directory too."
     (my/install-fonts)
     (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
 
-(use-package doom-modeline
-  :custom
-  (doom-modeline-icon t)
-  (doom-modeline-major-mode-color-icon t)
-  :ensure t
-  :hook (after-init . doom-modeline-mode))
+
+(when (>= emacs-major-version 25)
+  (use-package doom-modeline
+    :custom
+    (doom-modeline-icon t)
+    (doom-modeline-major-mode-color-icon t)
+    :ensure t
+    :hook (after-init . doom-modeline-mode)))
 
 ;;; window/frame layout
 
@@ -420,7 +423,8 @@ directory too."
      (t
       (paredit-semicolon))))
 
-  (when (package-installed-p 'eldoc)
+  (when (and (package-installed-p 'eldoc)
+             (symbol-function 'eldoc-add-command))
     (eldoc-add-command
      'paredit-backward-delete
      'paredit-close-round))
@@ -433,7 +437,8 @@ directory too."
   (add-hook 'lisp-mode-hook 'paredit-mode)
   (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
 
-(when (executable-find "git")
+(when (and (executable-find "git")
+           (>= emacs-major-version 25))
   (use-package ssh-agency
     :ensure t)
 
@@ -539,22 +544,23 @@ directory too."
      (java-mode . "java")
      (awk-mode . "awk"))))
 
-(use-package ggtags
-  :ensure t
-  :commands ggtags-mode
-  :diminish ggtags-mode
-  :bind (:map ggtags-mode-map
-              ("C-c g s" . ggtags-find-other-symbol)
-              ("C-c g h" . ggtags-view-tag-history)
-              ("C-c g r" . ggtags-find-reference)
-              ("C-c g f" . ggtags-find-file)
-              ("C-c g c" . ggtags-create-tags)
-              ("C-c g u" . ggtags-update-tags))
-  :init
-  (add-hook 'c-mode-common-hook
-            #'(lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                  (ggtags-mode +1)))))
+(when (>= emacs-major-version 25)
+  (use-package ggtags
+    :ensure t
+    :commands ggtags-mode
+    :diminish ggtags-mode
+    :bind (:map ggtags-mode-map
+                ("C-c g s" . ggtags-find-other-symbol)
+                ("C-c g h" . ggtags-view-tag-history)
+                ("C-c g r" . ggtags-find-reference)
+                ("C-c g f" . ggtags-find-file)
+                ("C-c g c" . ggtags-create-tags)
+                ("C-c g u" . ggtags-update-tags))
+    :init
+    (add-hook 'c-mode-common-hook
+              #'(lambda ()
+                  (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                    (ggtags-mode +1))))))
 
 (use-package cperl-mode
   :ensure t
@@ -755,7 +761,8 @@ directory too."
 (add-hook 'lisp-mode-hook 'prettify-symbols-mode)
 
 ;;Line numbers on files
-(add-hook 'find-file-hook 'display-line-numbers-mode)
+(when (symbol-function 'display-line-numbers-mode)
+  (add-hook 'find-file-hook 'display-line-numbers-mode))
 
 ;;;; auto-mode-alist
 (add-to-list 'auto-mode-alist '("\\.exe$" . hexl-mode))
