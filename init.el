@@ -350,6 +350,10 @@ directory too."
   (slack-buffer-enable-emojify t)
   (slack-prefer-current-team t))
 
+(use-package ace-window
+  :ensure t
+  :bind (("C-x o" . ace-window)))
+
 (use-package window-purpose
   :ensure t
   :config
@@ -748,6 +752,12 @@ directory too."
   (kill-buffer (current-buffer)))
 
 (global-set-key (kbd "<C-f4>") 'my/kill-current-buffer)
+
+(global-set-key (kbd "<C-tab>") 'other-window)
+(defun my/previous-window ()
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "<C-S-tab>") 'my/previous-window)
 
 (global-set-key [remap delete-char] 'my/delete-region-or-char)
 (global-set-key [remap delete-forward-char] 'my/delete-region-or-char)
