@@ -337,8 +337,6 @@ directory too."
     :ensure t
     :hook (after-init . doom-modeline-mode)))
 
-;;; window/frame layout
-
 (use-package psession
   :ensure t
   :config
@@ -352,11 +350,20 @@ directory too."
   (slack-buffer-enable-emojify t)
   (slack-prefer-current-team t))
 
-;; (use-package helm-purpose
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (helm-purpose-setup)))
+(use-package window-purpose
+  :ensure t
+  :config
+  (purpose-mode))
+
+(use-package helm-purpose
+  :after (helm window-purpose)
+  :ensure t
+  :bind (("M-x" . helm-M-x)
+         :map purpose-mode-map
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files))
+  :config
+  (helm-purpose-setup))
 
 ;;;editing
 (use-package avy
@@ -777,5 +784,17 @@ directory too."
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.mtl$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xaml$" . nxml-mode))
+
+(when (and (package-installed-p 'window-purpose)
+           (package-installed-p 'sly))
+  (purpose-set-extension-configuration
+   :sly
+   (purpose-conf :name-purposes '(("*sly-macroexpansion*" . search)
+                                  ("*sly-description*" . search))
+                 :regexp-purposes '()
+                 :mode-purposes '((sly-mrepl-mode . terminal)
+                                  (sly-db-mode . terminal)
+                                  (sly-inspector-mode . search)
+                                  (sly-xref-mode . search)))))
 
 (setq debug-on-error nil)
