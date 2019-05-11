@@ -12,6 +12,7 @@
 /transient/
 /.sly-mrepl-history
 /recentf
+/.purpose-layout
 /.emacs.desktop
 /.emacs.desktop.lock
 /custom.el

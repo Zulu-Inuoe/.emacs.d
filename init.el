@@ -633,14 +633,19 @@ directory too."
   (sly-mrepl-history-file-name (expand-file-name ".sly-mrepl-history" user-emacs-directory))
   (sly-net-coding-system 'utf-8-unix)
   :config
-  (defun kill-sly-buffers ()
+  (defun my/kill-sly-buffers ()
     (interactive)
     (mapc
      (lambda (buffer)
        (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
                  (eql (string-match " \\*sly" (buffer-name buffer)) 0))
          (kill-buffer buffer)))
-     (buffer-list))))
+     (buffer-list))
+    t)
+
+  (defun my/kill-sly-buffers-on-close (process)
+    (my/kill-sly-buffers))
+  (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close))
 
 (use-package slime
   :if (package-installed-p 'slime)
@@ -795,6 +800,28 @@ directory too."
                  :mode-purposes '((sly-mrepl-mode . terminal)
                                   (sly-db-mode . terminal)
                                   (sly-inspector-mode . search)
-                                  (sly-xref-mode . search)))))
+                                  (sly-xref-mode . search))))
+
+  (defun my/sly-load-layout ()
+    (let ((layout (purpose-find-window-layout "sly")))
+      (when layout
+        (purpose-load-window-layout-file layout))))
+  (add-hook 'sly-connected-hook 'my/sly-load-layout)
+
+  (defun my/sly-reset-layout (_)
+    (purpose-load-recent-window-layout 1))
+  (add-hook 'sly-net-process-close-hooks 'my/sly-reset-layout))
+
+(when (package-installed-p 'window-purpose)
+  (defun my/load-default-layout (frame)
+    (when (file-exists-p purpose-default-layout-file)
+      (with-selected-frame frame
+        (purpose-load-window-layout-file))))
+  (add-hook 'after-make-frame-functions 'my/load-default-layout)
+
+  (defun my/save-default-layout (frame)
+    (with-selected-frame frame
+      (purpose-save-window-layout-file)))
+  (add-hook 'delete-frame-functions 'my/save-default-layout))
 
 (setq debug-on-error nil)
