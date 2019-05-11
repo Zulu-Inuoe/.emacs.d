@@ -97,7 +97,10 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
 
-(my/add-load-if-exists (expand-file-name "lisp/" user-emacs-directory))
+(cl-dolist (dir (directory-files (expand-file-name "lisp/" user-emacs-directory) t "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)"))
+  (let ((dirname (file-name-as-directory dir)))
+    (when (file-exists-p dirname)
+      (add-to-list 'load-path dirname))))
 
 ;; Sly hacking
 (my/add-load-if-exists "~/code/sly/")
@@ -653,6 +656,11 @@ directory too."
   (defun my/kill-sly-buffers-on-close (process)
     (my/kill-sly-buffers))
   (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close))
+
+(use-package sly-asdf
+  :after (sly)
+  :config
+  (add-to-list 'sly-contribs 'sly-asdf 'append))
 
 (use-package slime
   :if (package-installed-p 'slime)

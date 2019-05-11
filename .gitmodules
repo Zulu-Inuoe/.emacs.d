@@ -1,0 +1,3 @@
+[submodule "lisp/sly-asdf"]
+	path = lisp/sly-asdf
+	url = git@github.com:mmgeorge/sly-asdf.git
