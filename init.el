@@ -368,7 +368,8 @@ directory too."
 ;;;editing
 (use-package avy
   :ensure t
-  :bind ("M-g c" . avy-goto-char))
+  :bind (("M-g c" . avy-goto-char)
+         ("M-g g" . avy-goto-line)))
 
 (use-package which-key
   :ensure t
