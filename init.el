@@ -686,10 +686,6 @@ directory too."
                                   dired-directory
                                   (revert-buffer-function " %b" ("%b - Dir:  " default-directory)))))))
 
-(defun my/kill-current-buffer ()
-  (interactive)
-  (kill-buffer (current-buffer)))
-
 (defun my/eval-last-sexp-or-region (prefix)
   "Eval region from BEG to END if active, otherwise the last sexp."
   (interactive "P")
@@ -745,6 +741,11 @@ directory too."
 
 ;;;; Global key bindings
 (global-set-key (kbd "<M-f4>") 'delete-frame)
+
+(defun my/kill-current-buffer ()
+  (interactive)
+  (kill-buffer (current-buffer)))
+
 (global-set-key (kbd "<C-f4>") 'my/kill-current-buffer)
 
 (global-set-key [remap delete-char] 'my/delete-region-or-char)
