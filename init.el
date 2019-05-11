@@ -807,7 +807,8 @@ directory too."
   (purpose-set-extension-configuration
    :sly
    (purpose-conf :name-purposes '(("*sly-macroexpansion*" . search)
-                                  ("*sly-description*" . search))
+                                  ("*sly-description*" . search)
+                                  (" *sly-completion doc*" . search))
                  :regexp-purposes '()
                  :mode-purposes '((sly-mrepl-mode . terminal)
                                   (sly-db-mode . terminal)
