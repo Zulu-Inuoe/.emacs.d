@@ -357,7 +357,9 @@ directory too."
 (use-package window-purpose
   :ensure t
   :config
-  (purpose-mode))
+  (purpose-mode)
+  (require 'window-purpose-x)
+  (purpose-x-kill-setup))
 
 (use-package helm-purpose
   :after (helm window-purpose)
