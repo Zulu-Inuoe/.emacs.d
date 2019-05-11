@@ -203,6 +203,7 @@
   (:map company-mode-map
         ("<tab>" . company-indent-or-complete-common)
         :map company-active-map
+        ("<tab>" . company-complete-selection)
         ("<prior>" . company-previous-page)
         ("<next>" . company-next-page)
         ("<down>" . company-select-next)
