@@ -843,11 +843,11 @@ directory too."
     (when (file-exists-p purpose-default-layout-file)
       (with-selected-frame frame
         (purpose-load-window-layout-file))))
-  (add-hook 'after-make-frame-functions 'my/load-default-layout)
+  (add-hook 'after-make-frame-functions 'my/load-default-layout t)
 
   (defun my/save-default-layout (frame)
     (with-selected-frame frame
       (purpose-save-window-layout-file)))
-  (add-hook 'delete-frame-functions 'my/save-default-layout))
+  (add-hook 'delete-frame-functions 'my/save-default-layout t))
 
 (setq debug-on-error nil)
