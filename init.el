@@ -169,6 +169,7 @@
 
 (use-package elcord
   :if (package-installed-p 'elcord)
+  :custom (elcord-use-major-mode-as-main-icon t)
   :config
   (elcord-mode))
 
