@@ -363,8 +363,9 @@ directory too."
   :ensure t
   :config
   (purpose-mode)
-  (require 'window-purpose-x)
-  (purpose-x-kill-setup))
+  ;; (require 'window-purpose-x)
+  ;; (purpose-x-kill-setup)
+  )
 
 (use-package helm-purpose
   :after (helm window-purpose)
