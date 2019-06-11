@@ -1,4 +1,4 @@
-;;-*-coding: utf-8-unix-*-
+;;-*-coding: utf-8-unix; lexical-binding: t-*-
 (require 'cl)
 
 ;; Turn on debugging so I can fix any init breakage. Turns off at the end
@@ -372,9 +372,9 @@ MODE-CONF is a hash table mapping modes to purposes."
       (cl-block nil
         (maphash
          (let ((major-mode (purpose--buffer-major-mode buffer-or-name)))
-           #'(lambda (mode purpose)
-               (when (provided-mode-derived-p major-mode mode)
-                 (cl-return purpose))))
+           (lambda (mode purpose)
+             (when (provided-mode-derived-p major-mode mode)
+               (cl-return purpose))))
          mode-conf))))
   (byte-compile 'purpose--buffer-purpose-mode)
 
@@ -384,11 +384,11 @@ regexps matched by its name.
 REGEXP-CONF is a hash table mapping name regexps to purposes."
     (cl-block nil
       (maphash
-       #'(lambda (regexp purpose)
-           (when (purpose--buffer-purpose-name-regexp-1 buffer-or-name
-                                                        regexp
-                                                        purpose)
-             (cl-return purpose)))
+       (lambda (regexp purpose)
+         (when (purpose--buffer-purpose-name-regexp-1 buffer-or-name
+                                                      regexp
+                                                      purpose)
+           (cl-return purpose)))
        regexp-conf)))
   (byte-compile 'purpose--buffer-purpose-name-regexp)
 
@@ -396,8 +396,8 @@ REGEXP-CONF is a hash table mapping name regexps to purposes."
     "Like `maphash', but return a list the results of calling FUNCTION
 for each entry in hash-table TABLE."
     (let (results)
-      (maphash #'(lambda (key value)
-                   (push (funcall function key value) results))
+      (maphash (lambda (key value)
+                 (push (funcall function key value) results))
                table)
       results))
   (byte-compile 'purpose--iter-hash)
