@@ -368,12 +368,11 @@ MODE-CONF is a hash table mapping modes to purposes."
     (when (get-buffer buffer-or-name)     ; check if buffer exists
       (cl-block nil
         (maphash
-         (let ((major-mode (purpose--buffer-major-mode buffer-or-name)))
+         (let ((buffer-mode (purpose--buffer-major-mode buffer-or-name)))
            (lambda (mode purpose)
-             (when (provided-mode-derived-p major-mode mode)
+             (when (provided-mode-derived-p buffer-mode mode)
                (cl-return purpose))))
          mode-conf))))
-  (byte-compile 'purpose--buffer-purpose-mode)
 
   (defun purpose--buffer-purpose-name-regexp (buffer-or-name regexp-conf)
     "Return the purpose of buffer BUFFER-OR-NAME, as determined by the
@@ -387,7 +386,6 @@ REGEXP-CONF is a hash table mapping name regexps to purposes."
                                                       purpose)
            (cl-return purpose)))
        regexp-conf)))
-  (byte-compile 'purpose--buffer-purpose-name-regexp)
 
   (defun purpose--iter-hash (function table)
     "Like `maphash', but return a list the results of calling FUNCTION
