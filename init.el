@@ -102,9 +102,6 @@
     (when (file-exists-p dirname)
       (add-to-list 'load-path dirname))))
 
-;; Sly hacking
-(my/add-load-if-exists "~/code/sly/")
-
 (unless package-archive-contents
   (package-refresh-contents))
 
