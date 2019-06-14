@@ -359,44 +359,6 @@ directory too."
 (use-package window-purpose
   :ensure t
   :config
-
-  ;;; Define some more efficient versions of some purpose functions
-  (defun purpose--buffer-purpose-mode (buffer-or-name mode-conf)
-    "Return the purpose of buffer BUFFER-OR-NAME, as determined by its
-mode and MODE-CONF.
-MODE-CONF is a hash table mapping modes to purposes."
-    (when (get-buffer buffer-or-name)     ; check if buffer exists
-      (cl-block nil
-        (maphash
-         (let ((buffer-mode (purpose--buffer-major-mode buffer-or-name)))
-           (lambda (mode purpose)
-             (when (provided-mode-derived-p buffer-mode mode)
-               (cl-return purpose))))
-         mode-conf))))
-
-  (defun purpose--buffer-purpose-name-regexp (buffer-or-name regexp-conf)
-    "Return the purpose of buffer BUFFER-OR-NAME, as determined by the
-regexps matched by its name.
-REGEXP-CONF is a hash table mapping name regexps to purposes."
-    (cl-block nil
-      (maphash
-       (lambda (regexp purpose)
-         (when (purpose--buffer-purpose-name-regexp-1 buffer-or-name
-                                                      regexp
-                                                      purpose)
-           (cl-return purpose)))
-       regexp-conf)))
-
-  (defun purpose--iter-hash (function table)
-    "Like `maphash', but return a list the results of calling FUNCTION
-for each entry in hash-table TABLE."
-    (let (results)
-      (maphash (lambda (key value)
-                 (push (funcall function key value) results))
-               table)
-      results))
-  (byte-compile 'purpose--iter-hash)
-
   (purpose-mode)
   (require 'window-purpose-x)
   (purpose-x-kill-setup))
