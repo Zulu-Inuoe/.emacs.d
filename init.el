@@ -696,6 +696,7 @@ for each entry in hash-table TABLE."
 
 (use-package sly-asdf
   :after (sly)
+  :ensure t
   :config
   (add-to-list 'sly-contribs 'sly-asdf 'append))
 
