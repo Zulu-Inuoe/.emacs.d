@@ -819,21 +819,47 @@ directory too."
    (purpose-conf :name-purposes '(("*sly-macroexpansion*" . search)
                                   ("*sly-description*" . search)
                                   (" *sly-completion doc*" . search))
-                 :regexp-purposes '()
+                 :regexp-purposes '(("\\*sly-db.\**" . terminal)
+                                    ("\\*sly-xref.\**" . search))
                  :mode-purposes '((sly-mrepl-mode . terminal)
-                                  (sly-db-mode . terminal)
-                                  (sly-inspector-mode . search)
-                                  (sly-xref-mode . search))))
+                                  (sly-inspector-mode . search))))
 
   (defun my/sly-load-layout ()
     (let ((layout (purpose-find-window-layout "sly")))
       (when layout
         (purpose-load-window-layout-file layout))))
-  (add-hook 'sly-connected-hook 'my/sly-load-layout)
+  (add-hook 'sly-connected-hook 'my/sly-load-layout t)
 
   (defun my/sly-reset-layout (_)
     (purpose-load-recent-window-layout 1))
-  (add-hook 'sly-net-process-close-hooks 'my/sly-reset-layout))
+  (add-hook 'sly-net-process-close-hooks 'my/sly-reset-layout t)
+
+  (defun my/sly-inspector-mode-hook ()
+    (make-local-variable 'minor-mode-overriding-map-alist)
+    (push (cons 'sly-mode
+                (let ((map (make-sparse-keymap)))
+                  (define-key map (kbd "M-.") 'sly-edit-definition-other-window)
+                  map))
+          minor-mode-overriding-map-alist))
+  (add-hook 'sly-inspector-mode-hook 'my/sly-inspector-mode-hook)
+
+  (defun my/sly-mrepl-mode-hook ()
+    (make-local-variable 'minor-mode-overriding-map-alist)
+    (push (cons 'sly-mode
+                (let ((map (make-sparse-keymap)))
+                  (define-key map (kbd "M-.") 'sly-edit-definition-other-window)
+                  map))
+          minor-mode-overriding-map-alist))
+  (add-hook 'sly-mrepl-mode-hook 'my/sly-mrepl-mode-hook)
+
+  (defun my/sly-db-mode-hook ()
+    (make-local-variable 'minor-mode-overriding-map-alist)
+    (push (cons 'sly-mode
+                (let ((map (make-sparse-keymap)))
+                  (define-key map (kbd "M-.") 'sly-edit-definition-other-window)
+                  map))
+          minor-mode-overriding-map-alist))
+  (add-hook 'sly-db-mode-hook 'my/sly-db-mode-hook))
 
 (when (package-installed-p 'window-purpose)
   (defun my/load-default-layout (frame)
