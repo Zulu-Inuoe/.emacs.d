@@ -57,6 +57,7 @@
 
 (global-auto-revert-mode +1)
 (recentf-mode +1)
+(delete-selection-mode +1)
 
 ;; Minor visual/input stuff
 (setq-default
@@ -708,24 +709,6 @@ directory too."
       (eval-region (min (point) (mark)) (max (point) (mark)))
     (eval-last-sexp prefix)))
 
-(defun my/delete-region-or-char (arg)
-  (interactive "p")
-  (if (use-region-p)
-      (delete-region (region-beginning) (region-end))
-    (delete-char arg)))
-
-(defun my/delete-region-or-forward ()
-  (interactive)
-  (if (use-region-p)
-      (delete-region (region-beginning) (region-end))
-    (delete-char 1)))
-
-(defun my/delete-region-or-backward ()
-  (interactive)
-  (if (use-region-p)
-      (delete-region (region-beginning) (region-end))
-    (backward-delete-char 1)))
-
 (defun my/kill-region-or-kill-line ()
   (interactive)
   (if (use-region-p)
@@ -768,10 +751,6 @@ directory too."
   (interactive)
   (other-window -1))
 (global-set-key (kbd "<C-S-tab>") 'my/previous-window)
-
-(global-set-key [remap delete-char] 'my/delete-region-or-char)
-(global-set-key [remap delete-forward-char] 'my/delete-region-or-char)
-(global-set-key [remap delete-backward-char] 'my/delete-region-or-backward)
 
 (global-set-key [remap kill-line] 'my/kill-region-or-kill-line)
 (global-set-key [remap kill-word] 'my/kill-region-or-kill-word)
