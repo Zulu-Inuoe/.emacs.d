@@ -797,7 +797,8 @@ directory too."
    :sly
    (purpose-conf :name-purposes '(("*sly-macroexpansion*" . search)
                                   ("*sly-description*" . search)
-                                  (" *sly-completion doc*" . search))
+                                  (" *sly-completion doc*" . search)
+                                  ("*sly-compilation*" . search))
                  :regexp-purposes '(("\\*sly-db.\**" . terminal)
                                     ("\\*sly-xref.\**" . search))
                  :mode-purposes '((sly-mrepl-mode . terminal)
