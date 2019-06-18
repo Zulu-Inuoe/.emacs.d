@@ -284,9 +284,9 @@
   :ensure t
   :defer nil
   :bind (:map company-mode-map
-              ("C-:" . helm-company)
+              ("C-S-SPC" . helm-company)
               :map company-active-map
-              ("C-:" . helm-company)))
+              ("C-S-SPC" . helm-company)))
 
 (use-package shrink-path
   :ensure t
@@ -377,8 +377,8 @@ directory too."
 ;;;editing
 (use-package avy
   :ensure t
-  :bind (("M-g c" . avy-goto-char)
-         ("M-g g" . avy-goto-line)))
+  :bind (("C-:" . avy-goto-char)
+         ("M-g M-g" . avy-goto-line)))
 
 (use-package which-key
   :ensure t
