@@ -659,8 +659,17 @@ directory too."
 (use-package sly-asdf
   :after (sly)
   :ensure t
+  :bind (:map sly-mode-map
+              ("C-c L" . my/load-current-system-or-ask))
+  :defer nil
   :config
-  (add-to-list 'sly-contribs 'sly-asdf 'append))
+  (add-to-list 'sly-contribs 'sly-asdf 'append)
+
+  (defun my/load-current-system-or-ask ()
+    (interactive)
+    (if (sly-connected-p)
+        (sly-asdf-load-system (or (sly-asdf-find-current-system) (sly-asdf-read-system-name)))
+      (message "Not connected."))))
 
 (use-package slime
   :if (package-installed-p 'slime)
