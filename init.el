@@ -631,7 +631,9 @@ directory too."
   :custom (markdown-command "pandoc"))
 
 (use-package sly
-;  :if (package-installed-p 'sly)
+  ;; :if (package-installed-p 'sly)
+  :bind (:map sly-mrepl-mode-map
+              ("<S-return>" . [remap newline]))
   :custom
   (inferior-lisp-program "sbcl")
   (sly-command-switch-to-existing-lisp 'always)
