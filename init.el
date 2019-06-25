@@ -793,6 +793,7 @@ directory too."
 (add-to-list 'auto-mode-alist '("\\.ros$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.sbclrc$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.slynkrc$" . lisp-mode))
+(add-to-list 'auto-mode-alist '("\\.lispworks$" . lisp-mode))
 
 (add-to-list 'auto-mode-alist '("\\.proj$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
