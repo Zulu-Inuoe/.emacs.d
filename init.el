@@ -21,9 +21,6 @@
     (when (file-exists-p dpath)
       (add-to-list 'load-path path))))
 
-(defun my/disable-show-trailing-whitespace ()
-  (setq show-trailing-whitespace nil))
-
 ;; keep customize settings in their own file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
