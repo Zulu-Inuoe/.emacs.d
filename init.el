@@ -584,10 +584,10 @@ directory too."
                 ("C-c g c" . ggtags-create-tags)
                 ("C-c g u" . ggtags-update-tags))
     :init
-    (add-hook 'c-mode-common-hook
-              #'(lambda ()
-                  (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                    (ggtags-mode +1))))))
+    (defun my/enable-ggtags-mode-in-c-like ()
+      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+        (ggtags-mode +1)))
+    (add-hook 'c-mode-common-hook 'my/enable-ggtags-mode-in-c-like)))
 
 (use-package cperl-mode
   :ensure t
