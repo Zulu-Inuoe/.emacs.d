@@ -657,12 +657,10 @@ directory too."
   :config
   (defun my/kill-sly-buffers ()
     (interactive)
-    (mapc
-     (lambda (buffer)
-       (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
+    (dolist (buffer (buffer-list))
+      (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
                  (eql (string-match " \\*sly" (buffer-name buffer)) 0))
          (kill-buffer buffer)))
-     (buffer-list))
     t)
 
   (defun my/kill-sly-buffers-on-close (process)
