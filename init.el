@@ -56,6 +56,8 @@
 (recentf-mode +1)
 (save-place-mode +1)
 (delete-selection-mode +1)
+(window-divider-mode +1)
+(size-indication-mode +1)
 
 ;; Minor visual/input stuff
 (setq-default
