@@ -380,6 +380,14 @@ directory too."
   :bind (("C-:" . avy-goto-char)
          ("M-g M-g" . avy-goto-line)))
 
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode +1))
+
+(use-package editorconfig-charset-extras
+  :ensure t)
+
 (use-package which-key
   :ensure t
   :defer nil
