@@ -95,10 +95,12 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
 
-(cl-dolist (dir (directory-files (expand-file-name "lisp/" user-emacs-directory) t "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)"))
-  (let ((dirname (file-name-as-directory dir)))
-    (when (file-exists-p dirname)
-      (add-to-list 'load-path dirname))))
+(let ((lisp-dir (expand-file-name "lisp/" user-emacs-directory)))
+  (when (file-exists-p lisp-dir)
+    (cl-dolist (dir (directory-files lisp-dir t "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)"))
+      (let ((dirname (file-name-as-directory dir)))
+        (when (file-exists-p dirname)
+          (add-to-list 'load-path dirname))))))
 
 (unless package-archive-contents
   (package-refresh-contents))
