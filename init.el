@@ -665,7 +665,8 @@ directory too."
 
   (defun my/kill-sly-buffers-on-close (process)
     (my/kill-sly-buffers))
-  (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close))
+  (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close)
+  (add-hook 'sly-compilation-finished-hook 'sly-show-compilation-log t))
 
 (use-package sly-asdf
   :after (sly)
