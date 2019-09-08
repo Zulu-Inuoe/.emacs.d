@@ -119,10 +119,8 @@ There are two things you can do about this warning:
         (when (file-exists-p dirname)
           (add-to-list 'load-path dirname))))))
 
-(unless package-archive-contents
-  (package-refresh-contents))
-
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
 
 (unless (package-installed-p 'diminish)
