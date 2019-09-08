@@ -281,6 +281,7 @@ There are two things you can do about this warning:
   (helm-move-to-line-cycle-in-source t)
   (helm-recentf-fuzzy-match t)
   :config
+  (require 'helm-files)
   (require 'helm-config)
   (helm-mode +1))
 
