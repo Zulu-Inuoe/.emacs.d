@@ -770,7 +770,7 @@ directory too."
           (set-buffer-modified-p nil))))))
 
 ;;;; Global key bindings
-(global-set-key (kbd "<M-f4>") 'delete-frame)
+(global-set-key (kbd "<M-f4>") (if server-mode 'delete-frame 'save-buffers-kill-emacs))
 
 (defun my/kill-current-buffer ()
   (interactive)
