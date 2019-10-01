@@ -196,9 +196,8 @@ There are two things you can do about this warning:
 
 (use-package rainbow-delimiters
   :ensure t
-  :config
-  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode-enable)
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode-enable))
+  :hook (lisp-mode . rainbow-delimiters-mode-enable)
+  :hook (emacs-lisp-mode . rainbow-delimiters-mode-enable))
 
 (use-package solaire-mode
   :ensure t
@@ -598,11 +597,11 @@ directory too."
                 ("C-c g f" . ggtags-find-file)
                 ("C-c g c" . ggtags-create-tags)
                 ("C-c g u" . ggtags-update-tags))
+    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
     :init
     (defun my/enable-ggtags-mode-in-c-like ()
       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-        (ggtags-mode +1)))
-    (add-hook 'c-mode-common-hook 'my/enable-ggtags-mode-in-c-like)))
+        (ggtags-mode +1)))))
 
 (use-package cperl-mode
   :ensure t
