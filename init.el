@@ -714,6 +714,10 @@ directory too."
         (sly-asdf-load-system (or (sly-asdf-find-current-system) (sly-asdf-read-system-name)))
       (message "Not connected."))))
 
+(use-package sly-macrostep
+  :after (sly)
+  :ensure t)
+
 (use-package slime
   :if (package-installed-p 'slime)
   :custom (slime-contribs '(slime-fancy)))
