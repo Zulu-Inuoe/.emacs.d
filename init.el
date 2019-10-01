@@ -582,6 +582,12 @@ directory too."
   :ensure t
   :mode "\\.g4$")
 
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js$"
+  :init
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+
 (use-package cc-mode
   :custom
   (c-default-style
@@ -711,6 +717,10 @@ directory too."
 (use-package slime
   :if (package-installed-p 'slime)
   :custom (slime-contribs '(slime-fancy)))
+
+(use-package sql-indent
+  :ensure t
+  :hook (sql-mode . sqlind-minor-mode))
 
 (use-package omnisharp
   :ensure t
