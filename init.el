@@ -567,6 +567,11 @@ directory too."
 
 ;;; languages & editing
 
+(use-package flycheck
+  :ensure t
+  :bind (("M-p" . flycheck-previous-error)
+         ("M-n" . flycheck-next-error)))
+
 (use-package adoc-mode
   :ensure t
   :mode "\\.adoc$"
@@ -648,6 +653,14 @@ directory too."
 (use-package powershell
   :ensure t
   :mode ("\\.ps1$" . powershell-mode))
+
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable)
+  (when (package-installed-p 'flycheck)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode)))
 
 (use-package markdown-mode
   :ensure t
