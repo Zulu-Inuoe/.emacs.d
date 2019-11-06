@@ -582,12 +582,6 @@ directory too."
   :ensure t
   :mode "\\.g4$")
 
-(use-package js2-mode
-  :ensure t
-  :mode "\\.js$"
-  :init
-  (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
-
 (use-package cc-mode
   :custom
   (c-default-style
@@ -640,10 +634,33 @@ directory too."
       (comment-region (min (point) (mark)) (max (point) (mark)))
     (self-insert-command 1)))
 
-(use-package js
+(use-package js2-mode
+  :ensure t
   :bind (:map js-mode-map
               ("/" . my/comment-region-if-mark))
-  :custom (js-indent-level 2))
+  :mode "\\.js$"
+  :hook (js2-mode-hook . js2-imenu-extras-mode)
+  (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+
+(use-package js2-refactor
+  :ensure t
+  :hook (js2-mode-hook . js2-refactor-mode)
+  :bind (:map js2-mode-map
+              ("C-k" . js2r-kill))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r"))
+
+(use-package xref-js2
+  :ensure t
+  :after js2-mode
+  :config
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (defun my/add-js2-xref-backend ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
+  (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
 
 (use-package lua-mode
   :ensure t
