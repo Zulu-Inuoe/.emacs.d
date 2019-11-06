@@ -698,6 +698,7 @@ directory too."
 
 (use-package sly
   ;; :if (package-installed-p 'sly)
+  :defer nil
   :custom
   (inferior-lisp-program "sbcl")
   (sly-command-switch-to-existing-lisp 'always)
