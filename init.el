@@ -375,10 +375,13 @@ directory too."
 
 (use-package window-purpose
   :ensure t
+  :custom (purpose-x-popwin-position 'right)
   :config
   (purpose-mode)
   (require 'window-purpose-x)
-  (purpose-x-kill-setup))
+  (purpose-x-popwin-setup)
+  (purpose-x-kill-setup)
+  (purpose-x-magit-multi-on))
 
 (use-package helm-purpose
   :after (helm window-purpose)
@@ -867,6 +870,18 @@ directory too."
 (add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.mtl$" . nxml-mode))
 (add-to-list 'auto-mode-alist '("\\.xaml$" . nxml-mode))
+
+(when (and (package-installed-p 'window-purpose)
+           (package-installed-p 'magit))
+  (purpose-set-extension-configuration
+   :magit
+   (purpose-conf :mode-purposes '((magit-mode . Magit))))
+
+  (add-to-list 'purpose-special-action-sequences
+               '(Magit
+                 purpose-display-reuse-window-buffer
+                 purpose-display-reuse-window-purpose
+                 purpose-display-pop-up-frame)))
 
 (when (and (package-installed-p 'window-purpose)
            (package-installed-p 'sly))
