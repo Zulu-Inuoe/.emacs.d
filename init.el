@@ -789,6 +789,22 @@ directory too."
       (eval-region (min (point) (mark)) (max (point) (mark)))
     (eval-last-sexp prefix)))
 
+(defun my/eval-sexp-and-replace (prefix)
+  (interactive "P")
+  (if (and (mark) (use-region-p))
+      (let ((val (eval (read (buffer-substring-no-properties (region-beginning) (region-end))))))
+        (delete-region (region-beginning) (region-end))
+        (save-excursion
+          (goto-char (region-beginning))
+          (prin1 val (current-buffer))))
+    (let ((val (eval (preceding-sexp)))
+          (opoint (point)))
+      (backward-sexp)
+      (delete-region (point) opoint)
+      (prin1 val (current-buffer)))))
+
+(global-set-key (kbd "C-c e") 'my/eval-sexp-and-replace)
+
 (defun my/kill-region-or-kill-line ()
   (interactive)
   (if (use-region-p)
