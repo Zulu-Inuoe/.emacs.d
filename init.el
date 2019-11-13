@@ -666,6 +666,9 @@ directory too."
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
   (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
 
+(use-package json-mode
+  :ensure t)
+
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
@@ -696,6 +699,13 @@ directory too."
   :mode "\\.md$"
   :mode ("README\\.md$" . gfm-mode)
   :custom (markdown-command "pandoc"))
+
+(use-package restclient
+  :ensure t
+  :after json-mode
+  :mode (("\\.http$" . restclient-mode))
+  :bind (:map restclient-mode-map
+              ("C-c C-f" . json-mode-beautify)))
 
 (use-package sly
   ;; :if (package-installed-p 'sly)
