@@ -90,6 +90,35 @@
  mouse-yank-at-point t
  show-trailing-whitespace t)
 
+(when (eq system-type 'windows-nt)
+  ;; Disable beeps on win32 and associate cp65001 with utf-8
+  (set-message-beep 'silent)
+  (define-coding-system-alias 'cp65001 'utf-8))
+
+;; Replace "yes or no" with y or n
+(defalias 'yes-or-no-p 'y-or-n-p)
+(put 'erase-buffer 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'list-timers 'disabled nil)
+
+;; Frame title bar formatting to show full path of file
+(setq-default
+ frame-title-format
+ (list '((buffer-file-name " %f"
+                           (dired-directory
+                            dired-directory
+                            (revert-buffer-function
+                             " %b"
+                             ("%b - Dir:  "
+                              default-directory)))))))
+
+(setq-default
+ icon-title-format
+ (list '((buffer-file-name " %f" (dired-directory
+                                  dired-directory
+                                  (revert-buffer-function " %b" ("%b - Dir:  " default-directory)))))))
+
 ;;;; Set up package management info
 
 ;; initialize all ELPA packages
@@ -765,34 +794,6 @@ directory too."
   (defun my/add-js2-xref-backend ()
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
   (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
-
-(when (eq system-type 'windows-nt)
-  (set-message-beep 'silent)
-  (define-coding-system-alias 'cp65001 'utf-8))
-
-;; Replace "yes or no" with y or n
-(defalias 'yes-or-no-p 'y-or-n-p)
-(put 'erase-buffer 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'list-timers 'disabled nil)
-
-;; Frame title bar formatting to show full path of file
-(setq-default
- frame-title-format
- (list '((buffer-file-name " %f"
-                           (dired-directory
-                            dired-directory
-                            (revert-buffer-function
-                             " %b"
-                             ("%b - Dir:  "
-                              default-directory)))))))
-
-(setq-default
- icon-title-format
- (list '((buffer-file-name " %f" (dired-directory
-                                  dired-directory
-                                  (revert-buffer-function " %b" ("%b - Dir:  " default-directory)))))))
 
 (defun my/eval-last-sexp-or-region (prefix)
   "Eval region from BEG to END if active, otherwise the last sexp."
