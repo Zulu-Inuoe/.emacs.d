@@ -592,12 +592,6 @@ directory too."
   :custom
   (rg-group-result nil))
 
-;;; passive tools
-
-(use-package doc-view
-  :custom
-  (doc-view-ghostscript-program "gswin64c"))
-
 ;;; languages & editing
 
 (use-package adoc-mode
@@ -636,7 +630,9 @@ directory too."
   :ensure t
   :bind (:map doc-view-mode-map
               ("M-v" . backward-page)
-              ("C-v" . forward-page)))
+              ("C-v" . forward-page))
+  :custom
+  (doc-view-ghostscript-program "gswin64c"))
 
 (use-package elpy
   :ensure t
