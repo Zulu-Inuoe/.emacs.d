@@ -668,6 +668,10 @@ directory too."
       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
         (ggtags-mode +1)))))
 
+(use-package hexl
+  :mode ("\\.exe$" . hexl-mode)
+  :mode ("\\.dll$" . hexl-mode))
+
 (use-package json-mode
   :ensure t)
 
@@ -682,10 +686,9 @@ directory too."
   :bind (:map js-mode-map
               ("/" . my/comment-region-if-mark))
   :mode "\\.js$"
+  :interpreter "node"
   :hook (js2-mode . js2-imenu-extras-mode)
-  :custom (js2-basic-offset 2)
-  :config
-  (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
+  :custom (js2-basic-offset 2))
 
 (use-package js2-refactor
   :ensure t
@@ -702,6 +705,10 @@ directory too."
   :custom (lua-indent-level 4))
 
 (use-package nxml-mode
+  :mode "\\.proj$"
+  :mode "\\.lyr$"
+  :mode "\\.mtl$"
+  :mode "\\.xaml$"
   :custom
   (nxml-attribute-indent 2)
   (nxml-slash-auto-complete-flag t))
@@ -887,19 +894,11 @@ directory too."
   (add-hook 'find-file-hook 'display-line-numbers-mode))
 
 ;;;; auto-mode-alist
-(add-to-list 'auto-mode-alist '("\\.exe$" . hexl-mode))
-(add-to-list 'auto-mode-alist '("\\.dll$" . hexl-mode))
-
 (add-to-list 'auto-mode-alist '("\\.eclrc$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.ros$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.sbclrc$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.slynkrc$" . lisp-mode))
 (add-to-list 'auto-mode-alist '("\\.lispworks$" . lisp-mode))
-
-(add-to-list 'auto-mode-alist '("\\.proj$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.lyr$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.mtl$" . nxml-mode))
-(add-to-list 'auto-mode-alist '("\\.xaml$" . nxml-mode))
 
 (when (and (package-installed-p 'window-purpose)
            (package-installed-p 'magit))
