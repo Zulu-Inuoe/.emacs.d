@@ -698,6 +698,13 @@ directory too."
   :config
   (js2r-add-keybindings-with-prefix "C-c C-r"))
 
+(use-package lisp-mode
+  :mode "\\.eclrc$"
+  :mode "\\.ros$"
+  :mode "\\.sbclrc$"
+  :mode "\\.slynkrc$"
+  :mode "\\.lispworks$")
+
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
@@ -892,13 +899,6 @@ directory too."
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
   (add-hook 'find-file-hook 'display-line-numbers-mode))
-
-;;;; auto-mode-alist
-(add-to-list 'auto-mode-alist '("\\.eclrc$" . lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.ros$" . lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.sbclrc$" . lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.slynkrc$" . lisp-mode))
-(add-to-list 'auto-mode-alist '("\\.lispworks$" . lisp-mode))
 
 (when (and (package-installed-p 'window-purpose)
            (package-installed-p 'magit))
