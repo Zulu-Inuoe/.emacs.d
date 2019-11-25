@@ -427,7 +427,7 @@ directory too."
 ;;;editing
 (use-package avy
   :ensure t
-  :bind (("C-:" . avy-goto-char)
+  :bind (("M-g c" . avy-goto-char-timer)
          ("M-g M-g" . avy-goto-line)))
 
 (use-package editorconfig
