@@ -65,7 +65,6 @@
  make-pointer-invisible nil
  echo-keystrokes 0.1
  frame-resize-pixelwise t
- eldoc-echo-area-use-multiline-p t
  read-file-name-completion-ignore-case t
  find-file-visit-truename nil
  mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control)))
@@ -634,6 +633,11 @@ directory too."
   :custom
   (doc-view-ghostscript-program "gswin64c"))
 
+(use-package eldoc
+  :diminish eldoc-mode
+  :hook (emacs-lisp-mode . turn-on-eldoc-mode)
+  :custom (eldoc-echo-area-use-multiline-p t))
+
 (use-package elpy
   :ensure t
   :config
@@ -884,10 +888,6 @@ directory too."
 ;;;; Mode-specific keybindings
 
 (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'my/eval-last-sexp-or-region)
-
-;;;; Hooks
-(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-(diminish 'eldoc-mode)
 
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
