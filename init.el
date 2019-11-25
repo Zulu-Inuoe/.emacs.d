@@ -228,6 +228,9 @@ There are two things you can do about this warning:
   :hook (lisp-mode . rainbow-delimiters-mode-enable)
   :hook (emacs-lisp-mode . rainbow-delimiters-mode-enable))
 
+(use-package paren
+  :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
+
 (use-package solaire-mode
   :ensure t
   :hook
@@ -452,6 +455,7 @@ directory too."
 (use-package paredit
   :ensure t
   :diminish paredit-mode
+  :hook ((lisp-mode emacs-lisp-mode) . paredit-mode)
   :config
   (defun my/paredit-delete-region-or-forward ()
     (interactive)
@@ -505,10 +509,7 @@ directory too."
   (define-key paredit-mode-map [remap paredit-semicolon] 'my/paredit-comment-line-or-sexp)
   (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
   (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
-  (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill)
-
-  (add-hook 'lisp-mode-hook 'paredit-mode)
-  (add-hook 'emacs-lisp-mode-hook 'paredit-mode))
+  (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill))
 
 (when (and (executable-find "git")
            (>= emacs-major-version 25))
@@ -705,6 +706,9 @@ directory too."
   :mode "\\.slynkrc$"
   :mode "\\.lispworks$")
 
+(use-package prog-mode
+  :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode))
+
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
@@ -886,15 +890,8 @@ directory too."
 (define-key emacs-lisp-mode-map (kbd "C-x C-e") 'my/eval-last-sexp-or-region)
 
 ;;;; Hooks
-(add-hook 'lisp-mode-hook 'show-paren-mode)
-(add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
-
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (diminish 'eldoc-mode)
-
-;;Prettify symbols
-(add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
-(add-hook 'lisp-mode-hook 'prettify-symbols-mode)
 
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
