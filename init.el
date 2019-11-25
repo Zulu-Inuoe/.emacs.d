@@ -227,6 +227,7 @@ There are two things you can do about this warning:
         ("C-d" . company-show-doc-buffer)
         ("M-." . company-show-location)
         ("SPC" . my/company-abort-and-insert))
+  :hook (prog-mode . company-mode)
   :custom
   (company-idle-delay 0)
   (company-require-match nil)
@@ -234,8 +235,7 @@ There are two things you can do about this warning:
   (defun my/company-abort-and-insert ()
     (interactive)
     (company-abort)
-    (self-insert-command 1))
-  (global-company-mode 1))
+    (self-insert-command 1)))
 
 (use-package elisp-slime-nav
   :ensure t
