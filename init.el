@@ -570,11 +570,6 @@ directory too."
 
 ;;; languages & editing
 
-(use-package flycheck
-  :ensure t
-  :bind (("M-p" . flycheck-previous-error)
-         ("M-n" . flycheck-next-error)))
-
 (use-package adoc-mode
   :ensure t
   :mode "\\.adoc$"
@@ -592,24 +587,6 @@ directory too."
      (c++-mode . "stroustrup")
      (java-mode . "java")
      (awk-mode . "awk"))))
-
-(when (>= emacs-major-version 25)
-  (use-package ggtags
-    :ensure t
-    :commands ggtags-mode
-    :diminish ggtags-mode
-    :bind (:map ggtags-mode-map
-                ("C-c g s" . ggtags-find-other-symbol)
-                ("C-c g h" . ggtags-view-tag-history)
-                ("C-c g r" . ggtags-find-reference)
-                ("C-c g f" . ggtags-find-file)
-                ("C-c g c" . ggtags-create-tags)
-                ("C-c g u" . ggtags-update-tags))
-    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
-    :init
-    (defun my/enable-ggtags-mode-in-c-like ()
-      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-        (ggtags-mode +1)))))
 
 (use-package cperl-mode
   :ensure t
@@ -630,6 +607,40 @@ directory too."
   :bind (:map doc-view-mode-map
               ("M-v" . backward-page)
               ("C-v" . forward-page)))
+
+(use-package elpy
+  :ensure t
+  :config
+  (elpy-enable)
+  (when (package-installed-p 'flycheck)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode)))
+
+(use-package flycheck
+  :ensure t
+  :bind (("M-p" . flycheck-previous-error)
+         ("M-n" . flycheck-next-error)))
+
+(when (>= emacs-major-version 25)
+  (use-package ggtags
+    :ensure t
+    :commands ggtags-mode
+    :diminish ggtags-mode
+    :bind (:map ggtags-mode-map
+                ("C-c g s" . ggtags-find-other-symbol)
+                ("C-c g h" . ggtags-view-tag-history)
+                ("C-c g r" . ggtags-find-reference)
+                ("C-c g f" . ggtags-find-file)
+                ("C-c g c" . ggtags-create-tags)
+                ("C-c g u" . ggtags-update-tags))
+    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
+    :init
+    (defun my/enable-ggtags-mode-in-c-like ()
+      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+        (ggtags-mode +1)))))
+
+(use-package json-mode
+  :ensure t)
 
 (defun my/comment-region-if-mark ()
   (interactive)
@@ -654,21 +665,6 @@ directory too."
   :config
   (js2r-add-keybindings-with-prefix "C-c C-r"))
 
-(use-package xref-js2
-  :ensure t
-  :after js2-mode
-  :config
-  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
-  ;; unbind it.
-  (define-key js-mode-map (kbd "M-.") nil)
-
-  (defun my/add-js2-xref-backend ()
-    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
-  (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
-
-(use-package json-mode
-  :ensure t)
-
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
@@ -680,18 +676,6 @@ directory too."
   (nxml-attribute-indent 2)
   (nxml-slash-auto-complete-flag t))
 
-(use-package powershell
-  :ensure t
-  :mode ("\\.ps1$" . powershell-mode))
-
-(use-package elpy
-  :ensure t
-  :config
-  (elpy-enable)
-  (when (package-installed-p 'flycheck)
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'flycheck-mode)))
-
 (use-package markdown-mode
   :ensure t
   :mode "\\.text$"
@@ -700,12 +684,27 @@ directory too."
   :mode ("README\\.md$" . gfm-mode)
   :custom (markdown-command "pandoc"))
 
+(use-package omnisharp
+  :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-omnisharp)
+  (add-hook 'csharp-mode-hook 'omnisharp-mode))
+
+(use-package powershell
+  :ensure t
+  :mode ("\\.ps1$" . powershell-mode))
+
 (use-package restclient
   :ensure t
   :after json-mode
   :mode (("\\.http$" . restclient-mode))
   :bind (:map restclient-mode-map
               ("C-c C-f" . json-mode-beautify)))
+
+(use-package slime
+  :if (package-installed-p 'slime)
+  :custom (slime-contribs '(slime-fancy)))
 
 (use-package sly
   ;; :if (package-installed-p 'sly)
@@ -750,20 +749,21 @@ directory too."
   :after (sly)
   :ensure t)
 
-(use-package slime
-  :if (package-installed-p 'slime)
-  :custom (slime-contribs '(slime-fancy)))
-
 (use-package sql-indent
   :ensure t
   :hook (sql-mode . sqlind-minor-mode))
 
-(use-package omnisharp
+(use-package xref-js2
   :ensure t
-  :after company
+  :after js2-mode
   :config
-  (add-to-list 'company-backends 'company-omnisharp)
-  (add-hook 'csharp-mode-hook 'omnisharp-mode))
+  ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
+  ;; unbind it.
+  (define-key js-mode-map (kbd "M-.") nil)
+
+  (defun my/add-js2-xref-backend ()
+    (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
+  (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
 
 (when (eq system-type 'windows-nt)
   (set-message-beep 'silent)
