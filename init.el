@@ -653,8 +653,9 @@ directory too."
   :bind (:map js-mode-map
               ("/" . my/comment-region-if-mark))
   :mode "\\.js$"
-  :hook (js2-mode-hook . js2-imenu-extras-mode)
+  :hook (js2-mode . js2-imenu-extras-mode)
   :custom (js2-basic-offset 2)
+  :config
   (add-to-list 'interpreter-mode-alist '("node" . js2-mode)))
 
 (use-package js2-refactor
