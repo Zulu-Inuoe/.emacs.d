@@ -70,8 +70,7 @@
  mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control)))
  cursor-in-non-selected-windows nil
  scroll-conservatively 101
- scroll-step 1
- truncate-lines t)
+ scroll-step 1)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -707,7 +706,12 @@ directory too."
   :mode "\\.lispworks$")
 
 (use-package prog-mode
-  :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode))
+  :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode)
+  :config
+  (defun my/on-prog-mode ()
+    (setf truncate-lines t
+          word-wrap nil))
+  (add-hook 'prog-mode-hook 'my/on-prog-mode))
 
 (use-package lua-mode
   :ensure t
@@ -800,6 +804,13 @@ directory too."
 (use-package sql-indent
   :ensure t
   :hook (sql-mode . sqlind-minor-mode))
+
+(use-package text-mode
+  :config
+  (defun my/on-text-mode ()
+    (setq truncate-lines nil
+          word-wrap t))
+  (add-hook 'text-mode-hook 'my/on-text-mode))
 
 (use-package xref-js2
   :ensure t
