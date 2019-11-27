@@ -914,7 +914,8 @@ directory too."
 
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
-  (add-hook 'find-file-hook 'display-line-numbers-mode))
+  (add-hook 'find-file-hook 'display-line-numbers-mode)
+  (setq-default display-line-numbers-width 3))
 
 (when (and (package-installed-p 'window-purpose)
            (package-installed-p 'magit))
