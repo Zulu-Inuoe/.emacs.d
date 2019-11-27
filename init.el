@@ -801,6 +801,9 @@ directory too."
   :after (sly)
   :ensure t)
 
+(use-package simple
+  :hook (text-mode . turn-on-visual-line-mode))
+
 (use-package sql-indent
   :ensure t
   :hook (sql-mode . sqlind-minor-mode))
@@ -811,6 +814,15 @@ directory too."
     (setq truncate-lines nil
           word-wrap t))
   (add-hook 'text-mode-hook 'my/on-text-mode))
+
+(use-package visual-fill-column
+  :ensure t
+  :hook (visual-line-mode . visual-fill-column-mode)
+  :custom
+  (visual-fill-column-center-text nil)
+  (visual-fill-column-fringes-outside-margins nil)
+  :config
+  (advice-add 'text-scale-adjust :after 'visual-fill-column-adjust))
 
 (use-package xref-js2
   :ensure t
