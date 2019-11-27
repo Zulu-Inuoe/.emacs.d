@@ -692,7 +692,7 @@ directory too."
 
 (use-package js2-refactor
   :ensure t
-  :hook (js2-mode-hook . js2-refactor-mode)
+  :hook (js2-mode . js2-refactor-mode)
   :bind (:map js2-mode-map
               ("C-k" . js2r-kill))
   :config
