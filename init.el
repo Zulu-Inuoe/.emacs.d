@@ -668,6 +668,13 @@ directory too."
       (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
         (ggtags-mode +1)))))
 
+(use-package help-mode
+  :config
+  (defun my/on-help-mode ()
+    (setq truncate-lines nil
+          word-wrap t))
+  (add-hook 'help-mode-hook 'my/on-help-mode))
+
 (use-package hexl
   :mode ("\\.exe$" . hexl-mode)
   :mode ("\\.dll$" . hexl-mode))
@@ -802,7 +809,7 @@ directory too."
   :ensure t)
 
 (use-package simple
-  :hook (text-mode . turn-on-visual-line-mode))
+  :hook ((text-mode help-mode) . turn-on-visual-line-mode))
 
 (use-package sql-indent
   :ensure t
