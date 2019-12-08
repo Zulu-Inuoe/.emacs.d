@@ -768,6 +768,8 @@ directory too."
 (use-package sly
   ;; :if (package-installed-p 'sly)
   :defer nil
+  :bind (:map sly-mode-map
+              ([remap sly-eval-last-expression] . my/sly-eval-in-mrepl))
   :custom
   (inferior-lisp-program "sbcl")
   (sly-command-switch-to-existing-lisp 'always)
@@ -786,6 +788,19 @@ directory too."
 
   (defun my/kill-sly-buffers-on-close (process)
     (my/kill-sly-buffers))
+
+  (defun my/sly-eval-in-mrepl ()
+    (interactive)
+    (let ((sexp (sly-last-expression)))
+      (with-current-buffer (sly-mrepl--find-buffer)
+        (goto-char (sly-mrepl--mark))
+        (let ((prev-input (buffer-substring (point) (point-max))))
+          (delete-region (point) (point-max))
+          (insert sexp)
+          (goto-char (point-max))
+          (sly-mrepl-return)
+          (insert prev-input)))))
+
   (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close)
   (add-hook 'sly-compilation-finished-hook 'sly-show-compilation-log t))
 
