@@ -207,10 +207,9 @@ There are two things you can do about this warning:
   (nyan-mode +1))
 
 (use-package elcord
-  :if (package-installed-p 'elcord)
   :custom (elcord-use-major-mode-as-main-icon t)
-  :config
-  (elcord-mode +1))
+  :ensure t
+  :config (elcord-mode +1))
 
 (use-package whitespace
   :diminish global-whitespace-mode
