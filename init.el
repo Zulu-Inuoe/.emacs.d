@@ -169,6 +169,10 @@ There are two things you can do about this warning:
 ;; Theme
 (setq-default custom-safe-themes t)
 
+(define-advice load-theme (:before (theme &optional no-confirm no-enable)
+                                   my/before-load-theme)
+  (mapc #'disable-theme custom-enabled-themes))
+
 (unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
   (package-install 'doom-themes))
 
