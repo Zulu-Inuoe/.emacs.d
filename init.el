@@ -211,8 +211,8 @@ There are two things you can do about this warning:
   (nyan-mode +1))
 
 (use-package elcord
-  :custom (elcord-use-major-mode-as-main-icon t)
   :ensure t
+  :custom (elcord-use-major-mode-as-main-icon t)
   :config (elcord-mode +1))
 
 (use-package whitespace
