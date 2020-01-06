@@ -333,12 +333,12 @@ There are two things you can do about this warning:
   (helm-posframe-enable)
 
   (defun my/posframe-poshandler-frame-top-center (info)
-    (cons (/ (+ (- (plist-get info :parent-frame-width)
+    "Like `posframe-poshandler-frame-top-center', but accounts for x-pixel-offset and y-pixel-offset"
+    (cons (+ (/ (- (plist-get info :parent-frame-width)
                    (plist-get info :posframe-width))
-                (plist-get info :x-pixel-offset))
-             2)
+                2)
+             (plist-get info :x-pixel-offset))
           (plist-get info :y-pixel-offset)))
-
 
   (define-advice helm-posframe-display (:around (orig-function buffer &optional _resume)
                                                 my/around-helm-posframe-display)
