@@ -804,7 +804,8 @@ directory too."
   ;; :if (package-installed-p 'sly)
   :defer nil
   :bind (:map sly-mode-map
-              ([remap sly-eval-last-expression] . my/sly-eval-in-mrepl))
+              ;; ([remap sly-eval-last-expression] . my/sly-eval-in-mrepl)
+              )
   :custom
   (inferior-lisp-program "sbcl")
   (sly-command-switch-to-existing-lisp 'always)
