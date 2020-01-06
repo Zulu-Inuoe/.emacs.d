@@ -357,6 +357,12 @@ There are two things you can do about this warning:
                             (border-width . 10))
      :respect-header-line t)))
 
+(use-package helm-sly
+  :after (helm sly)
+  :ensure t
+  :config
+  (global-helm-sly-mode +1))
+
 (use-package helm-swoop
   :after (helm)
   :ensure t
@@ -1047,5 +1053,9 @@ directory too."
     (with-selected-frame frame
       (purpose-save-window-layout-file)))
   (add-hook 'delete-frame-functions 'my/save-default-layout t))
+
+(eval-after-load 'company
+  '(eval-after-load 'sly
+     '(add-hook 'sly-mrepl-hook 'company-mode)))
 
 (setq debug-on-error nil)
