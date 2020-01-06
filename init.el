@@ -213,7 +213,28 @@ There are two things you can do about this warning:
 (use-package elcord
   :ensure t
   :custom (elcord-use-major-mode-as-main-icon t)
-  :config (elcord-mode +1))
+  :config
+  (elcord-mode +1)
+
+  (defun elcord--disable-elcord-if-no-frames (f)
+    (declare (ignore f))
+    (when (let ((frames (delete f (visible-frame-list))))
+            (or (null frames)
+                (and (null (cdr frames))
+                     (eq (car frames) terminal-frame))))
+      (elcord-mode -1)
+      (add-hook 'after-make-frame-functions 'elcord--enable-on-frame-created)))
+
+  (defun elcord--enable-on-frame-created (f)
+    (declare (ignore f))
+    (elcord-mode +1))
+
+  (defun my/elcord-mode-hook ()
+    (if elcord-mode
+        (add-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)
+      (remove-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)))
+
+  (add-hook 'elcord-mode-hook 'my/elcord-mode-hook))
 
 (use-package whitespace
   :diminish global-whitespace-mode
