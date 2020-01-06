@@ -317,6 +317,14 @@ There are two things you can do about this warning:
   (require 'helm-config)
   (helm-mode +1))
 
+(use-package helm-company
+  :after (helm company)
+  :ensure t
+  :defer nil
+  :bind (:map company-mode-map
+              ("C-S-SPC" . helm-company)
+              :map company-active-map
+              ("C-S-SPC" . helm-company)))
 
 (use-package helm-posframe
   :after (helm)
@@ -359,15 +367,6 @@ There are two things you can do about this warning:
          :map helm-swoop-map
          ("C-s" . helm-next-line)
          ("C-r" . helm-previous-line)))
-
-(use-package helm-company
-  :after (helm company)
-  :ensure t
-  :defer nil
-  :bind (:map company-mode-map
-              ("C-S-SPC" . helm-company)
-              :map company-active-map
-              ("C-S-SPC" . helm-company)))
 
 (use-package shrink-path
   :ensure t
