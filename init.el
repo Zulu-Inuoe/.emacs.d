@@ -317,6 +317,38 @@ There are two things you can do about this warning:
   (require 'helm-config)
   (helm-mode +1))
 
+
+(use-package helm-posframe
+  :after (helm)
+  :ensure t
+  :config
+  (helm-posframe-enable)
+
+  (defun my/posframe-poshandler-frame-top-center (info)
+    (cons (/ (+ (- (plist-get info :parent-frame-width)
+                   (plist-get info :posframe-width))
+                (plist-get info :x-pixel-offset))
+             2)
+          (plist-get info :y-pixel-offset)))
+
+
+  (define-advice helm-posframe-display (:around (orig-function buffer &optional _resume)
+                                                my/around-helm-posframe-display)
+    (setq helm-posframe-buffer buffer)
+    (posframe-show
+     buffer
+     :position (point)
+     :poshandler 'my/posframe-poshandler-frame-top-center
+     :max-width (- (frame-width) 5)
+     :max-height (- (frame-height) 5)
+     :min-width (truncate (frame-width) 1.5)
+     :min-height (truncate (frame-height) 1.5)
+     :y-pixel-offset 15
+     :font helm-posframe-font
+     :override-parameters '((internal-border-width . 5)
+                            (border-width . 10))
+     :respect-header-line t)))
+
 (use-package helm-swoop
   :after (helm)
   :ensure t
