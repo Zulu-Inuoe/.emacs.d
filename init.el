@@ -920,6 +920,9 @@ directory too."
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
   (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
 
+(use-package yaml-mode
+  :ensure t)
+
 (defun my/eval-last-sexp-or-region (prefix)
   "Eval region from BEG to END if active, otherwise the last sexp."
   (interactive "P")
