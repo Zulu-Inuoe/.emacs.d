@@ -879,7 +879,11 @@ directory too."
     (interactive)
     (if (sly-connected-p)
         (sly-asdf-load-system (or (sly-asdf-find-current-system) (sly-asdf-read-system-name)))
-      (message "Not connected."))))
+      (message "Not connected.")))
+
+  (define-advice sly-asdf-read-system-name (:around (orig-function &optional prompt default-value)
+                                                    my/sly-asdf-read-system-name-prefer-history)
+    (funcall orig-function prompt (or default-value (car sly-asdf-system-history) (sly-asdf-find-current-system)))))
 
 (use-package sly-macrostep
   :after (sly)
