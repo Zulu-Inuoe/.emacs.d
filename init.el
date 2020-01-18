@@ -1028,7 +1028,7 @@ directory too."
                                   ("*sly-description*" . search)
                                   (" *sly-completion doc*" . search)
                                   ("*sly-compilation*" . search))
-                 :regexp-purposes '(("\\*sly-db.\**" . terminal)
+                 :regexp-purposes '(("\\*sly-db.\**" . search)
                                     ("\\*sly-xref.\**" . search))
                  :mode-purposes '((sly-mrepl-mode . terminal)
                                   (sly-inspector-mode . search))))
