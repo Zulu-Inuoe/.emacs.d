@@ -685,6 +685,9 @@ directory too."
   :ensure t
   :mode "\\.cs$")
 
+(use-package cypher-mode
+  :ensure t)
+
 (use-package doc-view
   :ensure t
   :bind (:map doc-view-mode-map
