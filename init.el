@@ -216,6 +216,8 @@ There are two things you can do about this warning:
   :config
   (elcord-mode +1)
 
+  (add-to-list 'elcord-mode-icon-alist '(cypher-mode . "cypher-mode_icon"))
+
   (defun elcord--disable-elcord-if-no-frames (f)
     (declare (ignore f))
     (when (let ((frames (delete f (visible-frame-list))))
