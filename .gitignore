@@ -1,8 +1,8 @@
 /.cache/
 /auto-save-list/
 /url/
-/elpa/
 /elisp-objects/
+/elpa/
 /emojis/
 /eshell/
 /lisp/
@@ -17,4 +17,4 @@
 /.emacs.desktop.lock
 /custom.el
 /local.el
-places
+/places
