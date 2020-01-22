@@ -743,6 +743,12 @@ directory too."
   :mode ("\\.exe$" . hexl-mode)
   :mode ("\\.dll$" . hexl-mode))
 
+(use-package impatient-mode
+  :ensure t)
+
+(use-package js
+  :custom (js-indent-line 2))
+
 (use-package json-mode
   :ensure t)
 
@@ -830,6 +836,7 @@ directory too."
   :custom (slime-contribs '(slime-fancy)))
 
 (use-package sly
+  :ensure t
   ;; :if (package-installed-p 'sly)
   :defer nil
   :bind (:map sly-mode-map
@@ -914,6 +921,10 @@ directory too."
   (visual-fill-column-fringes-outside-margins nil)
   :config
   (advice-add 'text-scale-adjust :after 'visual-fill-column-adjust))
+
+(use-package web-mode
+  :ensure t
+  :mode "\\.html?$")
 
 (use-package xref-js2
   :ensure t
