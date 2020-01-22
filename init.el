@@ -901,6 +901,11 @@ directory too."
   :after (sly)
   :ensure t)
 
+(use-package sly-repl-ansi-color
+  :ensure t
+  :after (sly)
+  :config (add-to-list 'sly-contribs 'sly-repl-ansi-color))
+
 (use-package simple
   :hook ((text-mode help-mode) . turn-on-visual-line-mode))
 
