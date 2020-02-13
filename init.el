@@ -879,7 +879,14 @@ directory too."
           (insert prev-input)))))
 
   (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close)
-  (add-hook 'sly-compilation-finished-hook 'sly-show-compilation-log t))
+  (add-hook 'sly-compilation-finished-hook 'sly-show-compilation-log t)
+
+  (defun my/set-mrepl-bindings ()
+    (define-key sly-mrepl-mode-map (kbd "C-c C-l") 'sly-load-file)
+    (define-key sly-mrepl-mode-map (kbd "C-c I") 'sly-inspect)
+    (define-key sly-mrepl-mode-map (kbd "C-x C-e") 'sly-eval-last-expression))
+  (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings))
+
 
 (use-package sly-asdf
   :after (sly)
