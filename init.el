@@ -200,6 +200,9 @@ There are two things you can do about this warning:
   :custom
   (clution-run-style 'term))
 
+(use-package dotenv-mode
+  :ensure t)
+
 (use-package nyan-mode
   :ensure t
   :custom
