@@ -754,6 +754,7 @@ directory too."
   :custom (js-indent-line 2))
 
 (use-package json-mode
+  :custom (js-indent-level 2)
   :ensure t)
 
 (defun my/comment-region-if-mark ()
