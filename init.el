@@ -422,29 +422,6 @@ There are two things you can do about this warning:
          ("C-s" . helm-next-line)
          ("C-r" . helm-previous-line)))
 
-(use-package shrink-path
-  :ensure t
-  :config
-  (defun shrink-path--dirs-internal (full-path &optional truncate-all)
-    "Return fish-style truncated string based on FULL-PATH.
-Optional parameter TRUNCATE-ALL will cause the function to truncate the last
-directory too."
-    (let* ((home (expand-file-name "~"))
-           (path (replace-regexp-in-string
-                  (s-concat "^" home) "~" full-path))
-           (split (s-split "/" path 'omit-nulls))
-           (split-len (length split))
-           shrunk)
-      (->> split
-           (--map-indexed (if (= it-index (1- split-len))
-                              (if truncate-all (shrink-path--truncate it) it)
-                            (shrink-path--truncate it)))
-           (s-join "/")
-           (setq shrunk))
-      (s-concat (unless (s-matches? (rx bos (or "~" "/")) shrunk) "/")
-                shrunk
-                (unless (s-ends-with? "/" shrunk) "/")))))
-
 (use-package all-the-icons
   :ensure t
   :config
