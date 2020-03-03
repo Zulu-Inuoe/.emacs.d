@@ -1,5 +1,6 @@
 ;;-*-coding: utf-8-unix; lexical-binding: t-*-
 (require 'cl)
+(require 'subr-x)
 
 ;; Turn on debugging so I can fix any init breakage. Turns off at the end
 ;; But only turn on for graphic displays. Otherwise a daemon will be stuck
@@ -20,6 +21,13 @@
   (let ((dpath (file-name-as-directory path)))
     (when (file-exists-p dpath)
       (add-to-list 'load-path path))))
+
+(defun my/scoop-ensure (command &optional package)
+  (setf package (or package command))
+  (unless (executable-find command)
+    (if-let ((scoop (executable-find "scoop")))
+        (call-process scoop nil nil nil "install" package)
+      (warn "Can't find '%s', and 'scoop' is unavailable" package))))
 
 ;; keep customize settings in their own file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
