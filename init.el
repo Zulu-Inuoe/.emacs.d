@@ -73,6 +73,7 @@
  make-pointer-invisible nil
  echo-keystrokes 0.1
  frame-resize-pixelwise t
+ frame-inhibit-implied-resize t
  read-file-name-completion-ignore-case t
  find-file-visit-truename nil
  mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control)))
