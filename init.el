@@ -70,6 +70,7 @@
 ;; Minor visual/input stuff
 (setq-default
  inhibit-startup-screen t
+ initial-major-mode 'fundamental-mode
  make-pointer-invisible nil
  echo-keystrokes 0.1
  frame-resize-pixelwise t
