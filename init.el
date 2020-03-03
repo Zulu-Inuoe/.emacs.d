@@ -659,8 +659,10 @@ directory too."
     (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name)))))
 
 (use-package rg
-  :if (executable-find "rg")
   :ensure t
+  :init
+  (when (eq system-type 'windows-nt)
+    (my/scoop-ensure "rg" "ripgrep"))
   :custom
   (rg-group-result nil))
 
@@ -830,6 +832,9 @@ directory too."
 (use-package omnisharp
   :ensure t
   :after company
+  :init
+  (when (eq system-type 'windows-nt)
+    (my/scoop-ensure "pandoc"))
   :config
   (add-to-list 'company-backends 'company-omnisharp)
   (add-hook 'csharp-mode-hook 'omnisharp-mode))
@@ -950,7 +955,10 @@ directory too."
 
 (use-package web-mode
   :ensure t
-  :mode "\\.html?$")
+  :mode "\\.html?$"
+  :init
+  (when (eq system-type 'windows-nt)
+    (my/scoop-ensure "tidy")))
 
 (use-package xref-js2
   :ensure t
