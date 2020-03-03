@@ -213,6 +213,14 @@ There are two things you can do about this warning:
 (use-package dotenv-mode
   :ensure t)
 
+(use-package ediff
+  :after (winner)
+  :ensure t
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
+
 (use-package nyan-mode
   :ensure t
   :custom
@@ -258,6 +266,11 @@ There are two things you can do about this warning:
    '(face trailing tabs spaces newline empty indentation space-after-tab
           space-before-tab space-mark tab-mark newline-mark))
   :config (global-whitespace-mode +1))
+
+(use-package winner
+  :ensure t
+  :config
+  (winner-mode +1))
 
 (use-package rainbow-delimiters
   :ensure t
