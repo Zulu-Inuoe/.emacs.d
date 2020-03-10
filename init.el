@@ -892,9 +892,8 @@ There are two things you can do about this warning:
     (define-key sly-mrepl-mode-map (kbd "C-x C-e") 'sly-eval-last-expression))
   (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings)
 
-  (defun my/sly-change-directory-hook (dir)
-    (setf default-directory dir))
-  (add-hook 'sly-change-directory-hooks 'my/sly-change-directory-hook))
+  ;; Change directory of the buffer when we change directory in sly
+  (add-hook 'sly-change-directory-hooks 'cd))
 
 
 (use-package sly-asdf
