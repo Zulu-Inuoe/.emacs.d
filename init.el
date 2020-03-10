@@ -890,7 +890,11 @@ There are two things you can do about this warning:
     (define-key sly-mrepl-mode-map (kbd "C-c C-l") 'sly-load-file)
     (define-key sly-mrepl-mode-map (kbd "C-c I") 'sly-inspect)
     (define-key sly-mrepl-mode-map (kbd "C-x C-e") 'sly-eval-last-expression))
-  (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings))
+  (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings)
+
+  (defun my/sly-change-directory-hook (dir)
+    (setf default-directory dir))
+  (add-hook 'sly-change-directory-hooks 'my/sly-change-directory-hook))
 
 
 (use-package sly-asdf
