@@ -238,6 +238,8 @@ There are two things you can do about this warning:
   (elcord-mode +1)
 
   (add-to-list 'elcord-mode-icon-alist '(cypher-mode . "cypher-mode_icon"))
+  (add-to-list 'elcord-mode-icon-alist '(powershell-mode . "powershell-mode_icon"))
+  (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
 
   (defun elcord--disable-elcord-if-no-frames (f)
     (declare (ignore f))
