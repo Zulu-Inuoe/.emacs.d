@@ -866,8 +866,8 @@ There are two things you can do about this warning:
     (interactive)
     (dolist (buffer (buffer-list))
       (when (or (eql (string-match "\\*sly" (buffer-name buffer)) 0)
-                 (eql (string-match " \\*sly" (buffer-name buffer)) 0))
-         (kill-buffer buffer)))
+                (eql (string-match " \\*sly" (buffer-name buffer)) 0))
+        (kill-buffer buffer)))
     t)
 
   (defun my/kill-sly-buffers-on-close (process)
