@@ -258,7 +258,8 @@ There are two things you can do about this warning:
         (add-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)
       (remove-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)))
 
-  (add-hook 'elcord-mode-hook 'my/elcord-mode-hook))
+  (add-hook 'elcord-mode-hook 'my/elcord-mode-hook)
+  (my/elcord-mode-hook))
 
 (use-package whitespace
   :diminish global-whitespace-mode
