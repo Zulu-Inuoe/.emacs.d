@@ -250,6 +250,7 @@ There are two things you can do about this warning:
 
   (defun elcord--enable-on-frame-created (f)
     (declare (ignore f))
+    (remove-hook 'after-make-frame-functions 'elcord--enable-on-frame-created)
     (elcord-mode +1))
 
   (defun my/elcord-mode-hook ()
