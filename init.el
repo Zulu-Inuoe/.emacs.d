@@ -290,6 +290,13 @@ There are two things you can do about this warning:
 (use-package paren
   :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
 
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode +1)
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
 (use-package psession
   :ensure t
   :config
@@ -473,6 +480,12 @@ There are two things you can do about this warning:
      :override-parameters '((internal-border-width . 5)
                             (border-width . 10))
      :respect-header-line t)))
+
+(use-package helm-projectile
+  :after (helm projectile)
+  :ensure t
+  :config
+  (helm-projectile-on))
 
 (use-package helm-purpose
   :after (helm window-purpose)
