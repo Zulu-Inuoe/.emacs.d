@@ -943,7 +943,9 @@ There are two things you can do about this warning:
   (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings)
 
   ;; Change directory of the buffer when we change directory in sly
-  (add-hook 'sly-change-directory-hooks 'cd))
+  (add-hook 'sly-change-directory-hooks 'cd)
+  (remove-hook 'sly-compilation-finished-hook 'sly-show-compilation-log)
+  (add-hook 'sly-compilation-finished-hook 'sly-maybe-show-compilation-log))
 
 
 (use-package sly-asdf
