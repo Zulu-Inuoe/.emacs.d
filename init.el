@@ -947,6 +947,8 @@ There are two things you can do about this warning:
   (remove-hook 'sly-compilation-finished-hook 'sly-show-compilation-log)
   (add-hook 'sly-compilation-finished-hook 'sly-maybe-show-compilation-log))
 
+(when (package-installed-p 'company)
+  (add-hook 'sly-mrepl-hook 'company-mode))
 
 (use-package sly-asdf
   :after (sly)
@@ -1176,8 +1178,5 @@ There are two things you can do about this warning:
       (purpose-save-window-layout-file)))
   (add-hook 'delete-frame-functions 'my/save-default-layout t))
 
-(eval-after-load 'company
-  '(eval-after-load 'sly
-     '(add-hook 'sly-mrepl-hook 'company-mode)))
 
 (setq debug-on-error nil)
