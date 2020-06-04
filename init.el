@@ -479,7 +479,7 @@ There are two things you can do about this warning:
   :ensure t
   :custom (purpose-x-popwin-position 'right)
   :config
-  (purpose-mode)
+  (purpose-mode +1)
   (require 'window-purpose-x)
   (purpose-x-popwin-setup)
   (purpose-x-kill-setup)
