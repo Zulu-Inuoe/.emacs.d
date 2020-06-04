@@ -576,6 +576,49 @@ There are two things you can do about this warning:
      'paredit-backward-delete
      'paredit-close-round))
 
+  (defun my/parse-dispatch-macro-backwards ()
+    (let ((old-point (point)))
+      (if (save-match-data
+            (and (not (member (char-before) '(?\( ?#)))
+                 (re-search-backward "#[0-9]*" nil t)
+                 (= (match-end 0) (- old-point 1))))
+          (point)
+        (goto-char old-point)
+        nil)))
+
+  (defun my/space-for-dispatch-macro (endp delim)
+    (save-excursion
+      (or endp
+          (not (my/parse-dispatch-macro-backwards)))))
+
+  (defun my/parse-dispatch-macro ()
+    (forward-comment (buffer-size))
+    (save-match-data
+      (when (looking-at "#[0-9]*[^(#0-9]")
+        (goto-char (match-end 0)))))
+
+  (defun my/cl-dispatch-macro-forward-sexp (n)
+    (cond
+     ((> n 0)
+      (dotimes (i n)
+        (my/parse-dispatch-macro)
+        (let ((forward-sexp-function nil))
+          (forward-sexp))))
+     ((< n 0)
+      (dotimes (i (- n))
+        (let ((forward-sexp-function nil))
+          (forward-sexp -1))
+        (let ((old-point (point)))
+          (forward-comment (- (buffer-size)))
+          (unless (my/parse-dispatch-macro-backwards)
+            (goto-char old-point)))))))
+
+  (defun my/cl-mode-hook ()
+    (setq-local forward-sexp-function 'my/cl-dispatch-macro-forward-sexp)
+    (make-local-variable 'paredit-space-for-delimiter-predicates)
+    (push 'my/space-for-dispatch-macro paredit-space-for-delimiter-predicates))
+
+  (add-hook 'lisp-mode-hook 'my/cl-mode-hook)
   (define-key paredit-mode-map [remap paredit-semicolon] 'my/paredit-comment-line-or-sexp)
   (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
   (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
