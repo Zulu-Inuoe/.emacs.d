@@ -208,31 +208,42 @@ There are two things you can do about this warning:
 
 (load "local.el" t nil t t)
 
-(use-package clution
-  :if (require 'clution nil t)
-  :custom
-  (clution-run-style 'term))
+;; Visuals & frills
 
-(use-package dotenv-mode
-  :ensure t)
-
-(use-package ediff
-  :after (winner)
+(use-package all-the-icons
   :ensure t
-  :custom
-  (ediff-window-setup-function 'ediff-setup-windows-plain)
-  (ediff-split-window-function 'split-window-horizontally)
-  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
-
-(use-package nyan-mode
-  :ensure t
-  :custom
-  (nyan-animate-nyancat t)
-  (nyan-bar-length 10)
-  (nyan-mode nil)
-  (nyan-wavy-trail t)
   :config
-  (nyan-mode +1))
+  (when (eq system-type 'windows-nt)
+    (defun my/install-fonts ()
+      (call-process "powershell"
+                    nil nil nil
+                    "-NoProfile"
+                    "-ExecutionPolicy" "Bypass"
+                    "-File" (expand-file-name "install-fonts.ps1" user-emacs-directory)))
+    (defun my/uninstall-fonts ()
+      (call-process "powershell"
+                    nil nil nil
+                    "-NoProfile"
+                    "-ExecutionPolicy" "Bypass"
+                    "-File"  (expand-file-name "uninstall-fonts.ps1" user-emacs-directory)))
+
+    (my/install-fonts)
+    (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
+
+(use-package desktop
+  :ensure t
+  :defer nil
+  :config
+  (setq desktop-dirname user-emacs-directory)
+  (desktop-save-mode +1))
+
+(when (>= emacs-major-version 25)
+  (use-package doom-modeline
+    :custom
+    (doom-modeline-icon t)
+    (doom-modeline-major-mode-color-icon t)
+    :ensure t
+    :hook (after-init . doom-modeline-mode)))
 
 (use-package elcord
   :ensure t
@@ -266,26 +277,30 @@ There are two things you can do about this warning:
   (add-hook 'elcord-mode-hook 'my/elcord-mode-hook)
   (my/elcord-mode-hook))
 
-(use-package whitespace
-  :diminish global-whitespace-mode
+(use-package nyan-mode
+  :ensure t
   :custom
-  (whitespace-style
-   '(face trailing tabs spaces newline empty indentation space-after-tab
-          space-before-tab space-mark tab-mark newline-mark))
-  :config (global-whitespace-mode +1))
+  (nyan-animate-nyancat t)
+  (nyan-bar-length 10)
+  (nyan-mode nil)
+  (nyan-wavy-trail t)
+  :config
+  (nyan-mode +1))
 
-(use-package winner
+(use-package paren
+  :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
+
+(use-package psession
   :ensure t
   :config
-  (winner-mode +1))
+  (psession-mode +1)
+  (psession-savehist-mode +1)
+  (psession-autosave-mode +1))
 
 (use-package rainbow-delimiters
   :ensure t
   :hook (lisp-mode . rainbow-delimiters-mode-enable)
   :hook (emacs-lisp-mode . rainbow-delimiters-mode-enable))
-
-(use-package paren
-  :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
 
 (use-package solaire-mode
   :ensure t
@@ -296,7 +311,61 @@ There are two things you can do about this warning:
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
 
+(use-package whitespace
+  :diminish global-whitespace-mode
+  :custom
+  (whitespace-style
+   '(face trailing tabs spaces newline empty indentation space-after-tab
+          space-before-tab space-mark tab-mark newline-mark))
+  :config (global-whitespace-mode +1))
+
+;; Navitation & Utils
+(use-package avy
+  :ensure t
+  :bind (("M-g c" . avy-goto-char-timer)
+         ("M-g M-g" . avy-goto-line)))
+
+(use-package ace-window
+  :ensure t
+  :bind (("C-x o" . ace-window)))
+
+(when (>= emacs-major-version 25)
+  (use-package back-button
+    :ensure t
+    :diminish back-button-mode
+    :bind (("<mouse-4>" . back-button-global-backward)
+           ("<mouse-5>" . back-button-global-forward))))
+
+(use-package which-key
+  :ensure t
+  :defer nil
+  :diminish which-key-mode
+  :config (which-key-mode +1))
+
+(use-package window-purpose
+  :ensure t
+  :custom (purpose-x-popwin-position 'right)
+  :config
+  (purpose-mode +1)
+  (require 'window-purpose-x)
+  (purpose-x-popwin-setup)
+  (purpose-x-kill-setup)
+  (purpose-x-magit-multi-on))
+
+(use-package windsize
+  :ensure t
+  :bind (("C-S-<up>" . windsize-up)
+         ("C-S-<down>" . windsize-down)
+         ("C-S-<left>" . windsize-left)
+         ("C-S-<right>" . windsize-right)))
+
+(use-package winner
+  :ensure t
+  :config
+  (winner-mode +1))
+
 ;;;completion & input
+
 (use-package company
   :ensure t
   :diminish company-mode
@@ -329,13 +398,6 @@ There are two things you can do about this warning:
   :ensure t
   :diminish elisp-slime-nav-mode
   :hook ((lisp-interaction-mode emacs-lisp-mode) . elisp-slime-nav-mode))
-
-(when (>= emacs-major-version 25)
-  (use-package back-button
-    :ensure t
-    :diminish back-button-mode
-    :bind (("<mouse-4>" . back-button-global-backward)
-           ("<mouse-5>" . back-button-global-forward))))
 
 (use-package helm
   :ensure t
@@ -412,6 +474,16 @@ There are two things you can do about this warning:
                             (border-width . 10))
      :respect-header-line t)))
 
+(use-package helm-purpose
+  :after (helm window-purpose)
+  :ensure t
+  :bind (("M-x" . helm-M-x)
+         :map purpose-mode-map
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files))
+  :config
+  (helm-purpose-setup))
+
 (use-package helm-sly
   :after (helm sly)
   :ensure t
@@ -429,41 +501,85 @@ There are two things you can do about this warning:
          ("C-s" . helm-next-line)
          ("C-r" . helm-previous-line)))
 
-(use-package all-the-icons
+;; Misc tooling
+(use-package ediff
+  :after (winner)
   :ensure t
-  :config
-  (when (eq system-type 'windows-nt)
-    (defun my/install-fonts ()
-      (call-process "powershell"
-                    nil nil nil
-                    "-NoProfile"
-                    "-ExecutionPolicy" "Bypass"
-                    "-File" (expand-file-name "install-fonts.ps1" user-emacs-directory)))
-    (defun my/uninstall-fonts ()
-      (call-process "powershell"
-                    nil nil nil
-                    "-NoProfile"
-                    "-ExecutionPolicy" "Bypass"
-                    "-File"  (expand-file-name "uninstall-fonts.ps1" user-emacs-directory)))
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally)
+  (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
 
-    (my/install-fonts)
-    (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
+(when (and (executable-find "git")
+           (>= emacs-major-version 25))
+  (use-package ssh-agency
+    :ensure t)
 
-
-(when (>= emacs-major-version 25)
-  (use-package doom-modeline
-    :custom
-    (doom-modeline-icon t)
-    (doom-modeline-major-mode-color-icon t)
+  (use-package magit
     :ensure t
-    :hook (after-init . doom-modeline-mode)))
+    :bind ("C-x g" . magit-status)
+    :defer t
+    :custom (magit-set-upstream-on-push 'dontask)
+    :init
+    ;;Tell's git to use the TK GUI to ask for password
+    ;;This is a workaround to a problem with git when pushing
+    ;;over https
+    (setenv "GIT_ASKPASS" "git-gui--askpass")
+    (setenv "SSH_ASKPASS" "git-gui--askpass")))
 
-(use-package psession
+(use-package neotree
   :ensure t
+  :bind (([f8] . neotree-toggle)
+         :map neotree-mode-map
+         ("C-l" . my/neotree-go-up)
+         ("C-j" . my/neotree-go-down))
+  :custom
+  (neo-dont-be-alone t)
+  (neo-hidden-regexp-list
+   '("^\\." "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.fasl$"))
+  (neo-smart-open t)
+  (neo-theme 'nerd)
   :config
-  (psession-mode +1)
-  (psession-savehist-mode +1)
-  (psession-autosave-mode +1))
+  (defun my/neotree-go-down ()
+    (interactive)
+    (let ((dst (neo-buffer--get-filename-current-line)))
+      (when (file-directory-p dst)
+        (neo-global--open-dir dst))))
+
+  (defun my/neotree-go-up ()
+    (interactive)
+    (let ((prev-root (file-name-as-directory neo-buffer--start-node))
+          (new-root (file-name-directory (directory-file-name neo-buffer--start-node))))
+      (message "Prev-root: %s" prev-root)
+      (message "New root: %s" new-root)
+      (neo-global--open-dir new-root)
+      (neotree-find prev-root)))
+
+  (defun my/select-neotree-file (file)
+    (when (and file
+               (neo-global--window-exists-p)
+               (neo-global--file-in-root-p file))
+      (with-selected-window (selected-window)
+        (neotree-find file))))
+
+  (defadvice switch-to-buffer (after update-neotree-advice
+                                     (buffer-or-name
+                                      &optional
+                                      norecord force-same-window) activate)
+    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
+
+  (defadvice display-buffer (after update-neotree-advice
+                                   (buffer-or-name
+                                    &optional action frame) activate)
+    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name)))))
+
+(use-package rg
+  :ensure t
+  :init
+  (when (eq system-type 'windows-nt)
+    (my/scoop-ensure "rg" "ripgrep"))
+  :custom
+  (rg-group-result nil))
 
 (use-package slack
   :commands (start-slack)
@@ -471,35 +587,60 @@ There are two things you can do about this warning:
   (slack-buffer-enable-emojify t)
   (slack-prefer-current-team t))
 
-(use-package ace-window
-  :ensure t
-  :bind (("C-x o" . ace-window)))
-
-(use-package window-purpose
-  :ensure t
-  :custom (purpose-x-popwin-position 'right)
-  :config
-  (purpose-mode +1)
-  (require 'window-purpose-x)
-  (purpose-x-popwin-setup)
-  (purpose-x-kill-setup)
-  (purpose-x-magit-multi-on))
-
-(use-package helm-purpose
-  :after (helm window-purpose)
-  :ensure t
-  :bind (("M-x" . helm-M-x)
-         :map purpose-mode-map
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files))
-  :config
-  (helm-purpose-setup))
-
 ;;;editing
-(use-package avy
+
+(use-package clution
+  :if (require 'clution nil t)
+  :custom
+  (clution-run-style 'term))
+
+(use-package dotenv-mode
+  :ensure t)
+
+;;; languages & editing
+
+(use-package adoc-mode
   :ensure t
-  :bind (("M-g c" . avy-goto-char-timer)
-         ("M-g M-g" . avy-goto-line)))
+  :mode "\\.adoc$"
+  :mode "\\.ad$"
+  :mode "\\.asciidoc$")
+
+(use-package antlr-mode
+  :ensure t
+  :mode "\\.g4$")
+
+(use-package cc-mode
+  :custom
+  (c-default-style
+   '((c-mode . "stroustrup")
+     (c++-mode . "stroustrup")
+     (java-mode . "java")
+     (awk-mode . "awk"))))
+
+(use-package cperl-mode
+  :ensure t
+  :mode "\\.pl$"
+  :mode "\\.perl$"
+  :custom
+  (cperl-close-paren-offset -4)
+  (cperl-continued-statement-offset 4)
+  (cperl-indent-level 4)
+  (cperl-indent-parens-as-block t))
+
+(use-package csharp-mode
+  :ensure t
+  :mode "\\.cs$")
+
+(use-package cypher-mode
+  :ensure t)
+
+(use-package doc-view
+  :ensure t
+  :bind (:map doc-view-mode-map
+              ("M-v" . backward-page)
+              ("C-v" . forward-page))
+  :custom
+  (doc-view-ghostscript-program "gswin64c"))
 
 (use-package editorconfig
   :ensure t
@@ -509,18 +650,104 @@ There are two things you can do about this warning:
 (use-package editorconfig-charset-extras
   :ensure t)
 
-(use-package which-key
-  :ensure t
-  :defer nil
-  :diminish which-key-mode
-  :config (which-key-mode +1))
+(use-package eldoc
+  :diminish eldoc-mode
+  :hook (emacs-lisp-mode . turn-on-eldoc-mode)
+  :custom (eldoc-echo-area-use-multiline-p t))
 
-(use-package windsize
+(use-package elpy
   :ensure t
-  :bind (("C-S-<up>" . windsize-up)
-         ("C-S-<down>" . windsize-down)
-         ("C-S-<left>" . windsize-left)
-         ("C-S-<right>" . windsize-right)))
+  :config
+  (elpy-enable)
+  (when (package-installed-p 'flycheck)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode)))
+
+(use-package flycheck
+  :ensure t
+  :bind (("M-p" . flycheck-previous-error)
+         ("M-n" . flycheck-next-error)))
+
+(when (>= emacs-major-version 25)
+  (use-package ggtags
+    :ensure t
+    :commands ggtags-mode
+    :diminish ggtags-mode
+    :bind (:map ggtags-mode-map
+                ("C-c g s" . ggtags-find-other-symbol)
+                ("C-c g h" . ggtags-view-tag-history)
+                ("C-c g r" . ggtags-find-reference)
+                ("C-c g f" . ggtags-find-file)
+                ("C-c g c" . ggtags-create-tags)
+                ("C-c g u" . ggtags-update-tags))
+    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
+    :init
+    (defun my/enable-ggtags-mode-in-c-like ()
+      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+        (ggtags-mode +1)))))
+
+(use-package gitattributes-mode
+  :ensure t
+  :mode "^\\.gitattributes$")
+
+(use-package gitignore-mode
+  :ensure t
+  :mode "^\\.gitignore$")
+
+(use-package gitconfig-mode
+  :ensure t
+  :mode "^\\.gitconfig$")
+
+(use-package help-mode
+  :config
+  (defun my/on-help-mode ()
+    (setq truncate-lines nil
+          word-wrap t))
+  (add-hook 'help-mode-hook 'my/on-help-mode))
+
+(use-package hexl
+  :mode ("\\.exe$" . hexl-mode)
+  :mode ("\\.dll$" . hexl-mode))
+
+(use-package impatient-mode
+  :ensure t)
+
+(use-package js
+  :custom (js-indent-line 2))
+
+(use-package json-mode
+  :custom (js-indent-level 2)
+  :ensure t)
+
+(defun my/comment-region-if-mark ()
+  (interactive)
+  (if (use-region-p)
+      (comment-region (min (point) (mark)) (max (point) (mark)))
+    (self-insert-command 1)))
+
+(use-package js2-mode
+  :ensure t
+  :bind (:map js-mode-map
+              ("/" . my/comment-region-if-mark))
+  :mode "\\.js$"
+  :interpreter "node"
+  :hook (js2-mode . js2-imenu-extras-mode)
+  :custom (js2-basic-offset 2))
+
+(use-package js2-refactor
+  :ensure t
+  :hook (js2-mode . js2-refactor-mode)
+  :bind (:map js2-mode-map
+              ("C-k" . js2r-kill))
+  :config
+  (js2r-add-keybindings-with-prefix "C-c C-r"))
+
+(use-package lisp-mode
+  :mode "\\.eclrc$"
+  :mode "\\.ros$"
+  :mode "\\.sbclrc$"
+  :mode "\\.slynkrc$"
+  :mode "\\.lispworks$")
 
 (use-package paredit
   :ensure t
@@ -623,221 +850,6 @@ There are two things you can do about this warning:
   (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
   (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
   (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill))
-
-(when (and (executable-find "git")
-           (>= emacs-major-version 25))
-  (use-package ssh-agency
-    :ensure t)
-
-  (use-package magit
-    :ensure t
-    :bind ("C-x g" . magit-status)
-    :defer t
-    :custom (magit-set-upstream-on-push 'dontask)
-    :init
-    ;;Tell's git to use the TK GUI to ask for password
-    ;;This is a workaround to a problem with git when pushing
-    ;;over https
-    (setenv "GIT_ASKPASS" "git-gui--askpass")
-    (setenv "SSH_ASKPASS" "git-gui--askpass")))
-
-(use-package gitattributes-mode
-  :ensure t
-  :mode "^\\.gitattributes$")
-
-(use-package gitignore-mode
-  :ensure t
-  :mode "^\\.gitignore$")
-
-(use-package gitconfig-mode
-  :ensure t
-  :mode "^\\.gitconfig$")
-
-(use-package neotree
-  :ensure t
-  :bind (([f8] . neotree-toggle)
-         :map neotree-mode-map
-         ("C-l" . my/neotree-go-up)
-         ("C-j" . my/neotree-go-down))
-  :custom
-  (neo-dont-be-alone t)
-  (neo-hidden-regexp-list
-   '("^\\." "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.fasl$"))
-  (neo-smart-open t)
-  (neo-theme 'nerd)
-  :config
-  (defun my/neotree-go-down ()
-    (interactive)
-    (let ((dst (neo-buffer--get-filename-current-line)))
-      (when (file-directory-p dst)
-        (neo-global--open-dir dst))))
-
-  (defun my/neotree-go-up ()
-    (interactive)
-    (let ((prev-root (file-name-as-directory neo-buffer--start-node))
-          (new-root (file-name-directory (directory-file-name neo-buffer--start-node))))
-      (message "Prev-root: %s" prev-root)
-      (message "New root: %s" new-root)
-      (neo-global--open-dir new-root)
-      (neotree-find prev-root)))
-
-  (defun my/select-neotree-file (file)
-    (when (and file
-               (neo-global--window-exists-p)
-               (neo-global--file-in-root-p file))
-      (with-selected-window (selected-window)
-        (neotree-find file))))
-
-  (defadvice switch-to-buffer (after update-neotree-advice
-                                     (buffer-or-name
-                                      &optional
-                                      norecord force-same-window) activate)
-    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
-
-  (defadvice display-buffer (after update-neotree-advice
-                                   (buffer-or-name
-                                    &optional action frame) activate)
-    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name)))))
-
-(use-package rg
-  :ensure t
-  :init
-  (when (eq system-type 'windows-nt)
-    (my/scoop-ensure "rg" "ripgrep"))
-  :custom
-  (rg-group-result nil))
-
-;;; languages & editing
-
-(use-package adoc-mode
-  :ensure t
-  :mode "\\.adoc$"
-  :mode "\\.ad$"
-  :mode "\\.asciidoc$")
-
-(use-package antlr-mode
-  :ensure t
-  :mode "\\.g4$")
-
-(use-package cc-mode
-  :custom
-  (c-default-style
-   '((c-mode . "stroustrup")
-     (c++-mode . "stroustrup")
-     (java-mode . "java")
-     (awk-mode . "awk"))))
-
-(use-package cperl-mode
-  :ensure t
-  :mode "\\.pl$"
-  :mode "\\.perl$"
-  :custom
-  (cperl-close-paren-offset -4)
-  (cperl-continued-statement-offset 4)
-  (cperl-indent-level 4)
-  (cperl-indent-parens-as-block t))
-
-(use-package csharp-mode
-  :ensure t
-  :mode "\\.cs$")
-
-(use-package cypher-mode
-  :ensure t)
-
-(use-package doc-view
-  :ensure t
-  :bind (:map doc-view-mode-map
-              ("M-v" . backward-page)
-              ("C-v" . forward-page))
-  :custom
-  (doc-view-ghostscript-program "gswin64c"))
-
-(use-package eldoc
-  :diminish eldoc-mode
-  :hook (emacs-lisp-mode . turn-on-eldoc-mode)
-  :custom (eldoc-echo-area-use-multiline-p t))
-
-(use-package elpy
-  :ensure t
-  :config
-  (elpy-enable)
-  (when (package-installed-p 'flycheck)
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'flycheck-mode)))
-
-(use-package flycheck
-  :ensure t
-  :bind (("M-p" . flycheck-previous-error)
-         ("M-n" . flycheck-next-error)))
-
-(when (>= emacs-major-version 25)
-  (use-package ggtags
-    :ensure t
-    :commands ggtags-mode
-    :diminish ggtags-mode
-    :bind (:map ggtags-mode-map
-                ("C-c g s" . ggtags-find-other-symbol)
-                ("C-c g h" . ggtags-view-tag-history)
-                ("C-c g r" . ggtags-find-reference)
-                ("C-c g f" . ggtags-find-file)
-                ("C-c g c" . ggtags-create-tags)
-                ("C-c g u" . ggtags-update-tags))
-    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
-    :init
-    (defun my/enable-ggtags-mode-in-c-like ()
-      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-        (ggtags-mode +1)))))
-
-(use-package help-mode
-  :config
-  (defun my/on-help-mode ()
-    (setq truncate-lines nil
-          word-wrap t))
-  (add-hook 'help-mode-hook 'my/on-help-mode))
-
-(use-package hexl
-  :mode ("\\.exe$" . hexl-mode)
-  :mode ("\\.dll$" . hexl-mode))
-
-(use-package impatient-mode
-  :ensure t)
-
-(use-package js
-  :custom (js-indent-line 2))
-
-(use-package json-mode
-  :custom (js-indent-level 2)
-  :ensure t)
-
-(defun my/comment-region-if-mark ()
-  (interactive)
-  (if (use-region-p)
-      (comment-region (min (point) (mark)) (max (point) (mark)))
-    (self-insert-command 1)))
-
-(use-package js2-mode
-  :ensure t
-  :bind (:map js-mode-map
-              ("/" . my/comment-region-if-mark))
-  :mode "\\.js$"
-  :interpreter "node"
-  :hook (js2-mode . js2-imenu-extras-mode)
-  :custom (js2-basic-offset 2))
-
-(use-package js2-refactor
-  :ensure t
-  :hook (js2-mode . js2-refactor-mode)
-  :bind (:map js2-mode-map
-              ("C-k" . js2r-kill))
-  :config
-  (js2r-add-keybindings-with-prefix "C-c C-r"))
-
-(use-package lisp-mode
-  :mode "\\.eclrc$"
-  :mode "\\.ros$"
-  :mode "\\.sbclrc$"
-  :mode "\\.slynkrc$"
-  :mode "\\.lispworks$")
 
 (use-package prog-mode
   :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode)
