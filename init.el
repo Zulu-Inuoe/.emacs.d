@@ -52,13 +52,16 @@
    version-control t
    delete-old-versions t
    kept-new-versions 6
+   kept-old-versions 8
    create-lockfiles nil
    backup-by-copying t
    backup-directory-alist `((".*" . ,backups-dir))
    auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
    auto-save-list-file-prefix auto-saves-dir
    recentf-auto-cleanup 'never
-   recentf-save-file recentf-file))
+   recentf-save-file recentf-file
+   ;; Make backup files even in vc'd directories
+   vc-make-backup-files t))
 
 (global-auto-revert-mode +1)
 (recentf-mode +1)
