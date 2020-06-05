@@ -1047,13 +1047,6 @@ There are two things you can do about this warning:
 (use-package yaml-mode
   :ensure t)
 
-(defun my/eval-last-sexp-or-region (prefix)
-  "Eval region from BEG to END if active, otherwise the last sexp."
-  (interactive "P")
-  (if (and (mark) (use-region-p))
-      (eval-region (min (point) (mark)) (max (point) (mark)))
-    (eval-last-sexp prefix)))
-
 (defun my/eval-sexp-and-replace (prefix)
   (interactive "P")
   (if (and (mark) (use-region-p))
@@ -1118,10 +1111,6 @@ There are two things you can do about this warning:
 
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-
-;;;; Mode-specific keybindings
-
-(define-key emacs-lisp-mode-map (kbd "C-x C-e") 'my/eval-last-sexp-or-region)
 
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
