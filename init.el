@@ -638,6 +638,19 @@ There are two things you can do about this warning:
 (use-package editorconfig-charset-extras
   :ensure t)
 
+(use-package emacs-lisp-mode
+  :defer nil
+  :bind (:map emacs-lisp-mode-map
+              ("C-x C-e" . my/eval-dwim)
+              ("C-c C-l" . load-file))
+  :config
+  (defun my/eval-dwim (prefix)
+    "eval region from beg to end if active, otherwise the last sexp."
+    (interactive "P")
+    (if (use-region-p)
+        (eval-region (region-beginning) (region-end))
+      (eval-last-sexp prefix))))
+
 (use-package eldoc
   :diminish eldoc-mode
   :hook (emacs-lisp-mode . turn-on-eldoc-mode)
@@ -900,6 +913,7 @@ There are two things you can do about this warning:
   ;; :if (package-installed-p 'sly)
   :defer nil
   :bind (:map sly-mode-map
+              ("C-x C-e" . my/sly-eval-dwim)
               ;; ([remap sly-eval-last-expression] . my/sly-eval-in-mrepl)
               )
   :custom
@@ -933,13 +947,19 @@ There are two things you can do about this warning:
           (sly-mrepl-return)
           (insert prev-input)))))
 
+  (defun my/sly-eval-dwim ()
+    (interactive)
+    (if (use-region-p)
+        (sly-eval-region (region-beginning) (region-end))
+      (sly-eval-last-expression)))
+
   (add-hook 'sly-net-process-close-hooks 'my/kill-sly-buffers-on-close)
   (add-hook 'sly-compilation-finished-hook 'sly-show-compilation-log t)
 
   (defun my/set-mrepl-bindings ()
     (define-key sly-mrepl-mode-map (kbd "C-c C-l") 'sly-load-file)
     (define-key sly-mrepl-mode-map (kbd "C-c I") 'sly-inspect)
-    (define-key sly-mrepl-mode-map (kbd "C-x C-e") 'sly-eval-last-expression))
+    (define-key sly-mrepl-mode-map (kbd "C-x C-e") 'my/sly-eval-dwim))
   (add-hook 'sly-mrepl-mode-hook 'my/set-mrepl-bindings)
 
   ;; Change directory of the buffer when we change directory in sly
