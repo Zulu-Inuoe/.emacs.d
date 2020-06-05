@@ -252,9 +252,9 @@ There are two things you can do about this warning:
 (use-package elcord
   :ensure t
   :custom (elcord-use-major-mode-as-main-icon t)
+  :hook (after-init . elcord-mode)
+  :hook (elcord-mode . my/elcord-mode-hook)
   :config
-  (elcord-mode +1)
-
   (add-to-list 'elcord-mode-icon-alist '(cypher-mode . "cypher-mode_icon"))
   (add-to-list 'elcord-mode-icon-alist '(powershell-mode . "powershell-mode_icon"))
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
@@ -274,10 +274,7 @@ There are two things you can do about this warning:
   (defun my/elcord-mode-hook ()
     (if elcord-mode
         (add-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)
-      (remove-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames)))
-
-  (add-hook 'elcord-mode-hook 'my/elcord-mode-hook)
-  (my/elcord-mode-hook))
+      (remove-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames))))
 
 (use-package nyan-mode
   :ensure t
