@@ -542,52 +542,6 @@ There are two things you can do about this warning:
     (setenv "GIT_ASKPASS" "git-gui--askpass")
     (setenv "SSH_ASKPASS" "git-gui--askpass")))
 
-(use-package neotree
-  :ensure t
-  :bind (([f8] . neotree-toggle)
-         :map neotree-mode-map
-         ("C-l" . my/neotree-go-up)
-         ("C-j" . my/neotree-go-down))
-  :custom
-  (neo-dont-be-alone t)
-  (neo-hidden-regexp-list
-   '("^\\." "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.fasl$"))
-  (neo-smart-open t)
-  (neo-theme 'nerd)
-  :config
-  (defun my/neotree-go-down ()
-    (interactive)
-    (let ((dst (neo-buffer--get-filename-current-line)))
-      (when (file-directory-p dst)
-        (neo-global--open-dir dst))))
-
-  (defun my/neotree-go-up ()
-    (interactive)
-    (let ((prev-root (file-name-as-directory neo-buffer--start-node))
-          (new-root (file-name-directory (directory-file-name neo-buffer--start-node))))
-      (message "Prev-root: %s" prev-root)
-      (message "New root: %s" new-root)
-      (neo-global--open-dir new-root)
-      (neotree-find prev-root)))
-
-  (defun my/select-neotree-file (file)
-    (when (and file
-               (neo-global--window-exists-p)
-               (neo-global--file-in-root-p file))
-      (with-selected-window (selected-window)
-        (neotree-find file))))
-
-  (defadvice switch-to-buffer (after update-neotree-advice
-                                     (buffer-or-name
-                                      &optional
-                                      norecord force-same-window) activate)
-    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name))))
-
-  (defadvice display-buffer (after update-neotree-advice
-                                   (buffer-or-name
-                                    &optional action frame) activate)
-    (my/select-neotree-file (buffer-file-name (get-buffer buffer-or-name)))))
-
 (use-package rg
   :ensure t
   :init
