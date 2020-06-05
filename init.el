@@ -281,11 +281,9 @@ There are two things you can do about this warning:
   :custom
   (nyan-animate-nyancat t)
   (nyan-bar-length 10)
-  (nyan-mode nil)
   (nyan-wavy-trail t)
   (nyan-animation-frame-interval 0.5)
-  :config
-  (nyan-mode +1))
+  :hook (after-init . nyan-mode))
 
 (use-package paren
   :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
