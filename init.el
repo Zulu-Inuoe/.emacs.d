@@ -286,6 +286,7 @@ There are two things you can do about this warning:
   (nyan-bar-length 10)
   (nyan-mode nil)
   (nyan-wavy-trail t)
+  (nyan-animation-frame-interval 0.5)
   :config
   (nyan-mode +1))
 
