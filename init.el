@@ -260,7 +260,6 @@ There are two things you can do about this warning:
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
 
   (defun elcord--disable-elcord-if-no-frames (f)
-    (declare (ignore f))
     (when (let ((frames (delete f (visible-frame-list))))
             (or (null frames)
                 (and (null (cdr frames))
@@ -269,7 +268,6 @@ There are two things you can do about this warning:
       (add-hook 'after-make-frame-functions 'elcord--enable-on-frame-created)))
 
   (defun elcord--enable-on-frame-created (f)
-    (declare (ignore f))
     (remove-hook 'after-make-frame-functions 'elcord--enable-on-frame-created)
     (elcord-mode +1))
 
