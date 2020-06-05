@@ -924,6 +924,12 @@ There are two things you can do about this warning:
   (sly-mrepl-history-file-name (expand-file-name ".sly-mrepl-history" user-emacs-directory))
   (sly-net-coding-system 'utf-8-unix)
   :config
+  (define-advice sly-quit-lisp (:around (orig-function &optional kill interactive)
+                                        my/sly-quit-lisp-no-ask-if-single)
+    (if (null (cdr sly-net-processes))
+        (sly-quit-lisp-internal (sly-current-connection) 'sly-quit-sentinel kill)
+      (funcall orig-function kill interactive)))
+
   (defun my/kill-sly-buffers ()
     (interactive)
     (dolist (buffer (buffer-list))
