@@ -993,6 +993,10 @@ There are two things you can do about this warning:
   :after (sly)
   :ensure t)
 
+(use-package sly-named-readtables
+  :after (sly)
+  :ensure t)
+
 (use-package sly-repl-ansi-color
   :ensure t
   :after (sly)
