@@ -189,22 +189,26 @@ There are two things you can do about this warning:
 (unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
   (package-install 'doom-themes))
 
-(cond
- ((package-installed-p 'doom-themes)
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-one t)
-  (doom-themes-visual-bell-config)
+(defun my/after-init-load-themes ()
   (cond
-   ((package-installed-p 'treemacs)
-    (doom-themes-treemacs-config))
-   ((package-installed-p 'neotree)
-    (doom-themes-neotree-config))))
- ((package-installed-p 'zenburn-theme)
-  (load-theme 'zenburn t)))
+   ((package-installed-p 'doom-themes)
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (cond
+     ((package-installed-p 'treemacs)
+      ;; (doom-themes-treemacs-config)
+      )
+     ((package-installed-p 'neotree)
+      (doom-themes-neotree-config))))
+   ((package-installed-p 'zenburn-theme)
+    (load-theme 'zenburn t)))
 
-;; Doom will for whatever reason reset the buffer coding system..
-(setq-default buffer-file-coding-system 'utf-8-unix)
+  ;; Doom will for whatever reason reset the buffer coding system..
+  (setq-default buffer-file-coding-system 'utf-8-unix))
+
+(add-hook 'after-init-hook 'my/after-init-load-themes)
 
 (load "local.el" t nil t t)
 
