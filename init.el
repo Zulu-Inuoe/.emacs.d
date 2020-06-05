@@ -484,7 +484,7 @@ There are two things you can do about this warning:
      :respect-header-line t)))
 
 (use-package helm-projectile
-  :after (helm projectile)
+  :after helm projectile
   :ensure t
   :config
   (helm-projectile-on))
