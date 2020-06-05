@@ -983,8 +983,6 @@ There are two things you can do about this warning:
               ("C-c L" . my/load-current-system-or-ask))
   :defer nil
   :config
-  (add-to-list 'sly-contribs 'sly-asdf 'append)
-
   (defun my/load-current-system-or-ask ()
     (interactive)
     (if (sly-connected-p)
