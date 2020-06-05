@@ -258,6 +258,7 @@ There are two things you can do about this warning:
   (add-to-list 'elcord-mode-icon-alist '(cypher-mode . "cypher-mode_icon"))
   (add-to-list 'elcord-mode-icon-alist '(powershell-mode . "powershell-mode_icon"))
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
+  (add-to-list 'elcord-mode-icon-alist '(rjsx-mode . "react-mode_icon"))
 
   (defun elcord--disable-elcord-if-no-frames (f)
     (when (let ((frames (delete f (visible-frame-list))))
