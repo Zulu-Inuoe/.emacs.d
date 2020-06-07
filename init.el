@@ -643,14 +643,21 @@ There are two things you can do about this warning:
   :defer nil
   :bind (:map emacs-lisp-mode-map
               ("C-x C-e" . my/eval-dwim)
-              ("C-c C-l" . load-file))
+              ("C-c C-l" . my/load-file-dwim))
   :config
   (defun my/eval-dwim (prefix)
     "eval region from beg to end if active, otherwise the last sexp."
     (interactive "P")
     (if (use-region-p)
         (eval-region (region-beginning) (region-end))
-      (eval-last-sexp prefix))))
+      (eval-last-sexp prefix)))
+  (defun my/load-file-dwim (filename)
+    (interactive (list (let ((completion-ignored-extensions
+                              (remove module-file-suffix
+                                      (remove ".elc"
+                                              completion-ignored-extensions))))
+                         (read-file-name "Load file: " nil nil 'lambda (buffer-file-name)))))
+    (load-file filename)))
 
 (use-package eldoc
   :diminish eldoc-mode
