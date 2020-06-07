@@ -262,6 +262,24 @@ There are two things you can do about this warning:
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
   (add-to-list 'elcord-mode-icon-alist '(rjsx-mode . "react-mode_icon"))
 
+  (defvar my/lisp-impl-icon-alist
+    '(("armedbear" . "abcl-mode_icon")
+      ("ccl" . "ccl-mode_icon")
+      ("ECL" . "ecl-mode_icon")
+      ("lispworks" . "lispworks-mode_icon")
+      ("sbcl" . "sbcl-mode_icon")))
+
+  (defun my/choose-cl-impl (mode)
+    (let ((impl-name
+           (and (fboundp 'sly)
+                (sly-connected-p)
+                (sly-lisp-implementation-name))))
+      (cdr (assoc impl-name  my/lisp-impl-icon-alist))))
+
+  (when (seq-some (lambda (elt) (stringp (car elt))) elcord-mode-icon-alist)
+    (add-to-list 'elcord-mode-icon-alist '(lisp-mode . my/choose-cl-impl))
+    (add-to-list 'elcord-mode-icon-alist '("^sly-.*$" . my/choose-cl-impl)))
+
   (defun elcord--disable-elcord-if-no-frames (f)
     (when (let ((frames (delete f (visible-frame-list))))
             (or (null frames)
