@@ -542,6 +542,11 @@ There are two things you can do about this warning:
   (ediff-split-window-function 'split-window-horizontally)
   (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
 
+(use-package macrostep
+  :after (emacs-lisp-mode)
+  :bind (:map emacs-lisp-mode-map
+              ("C-c M-e" . macrostep-expand)))
+
 (when (and (executable-find "git")
            (>= emacs-major-version 25))
   (use-package ssh-agency
