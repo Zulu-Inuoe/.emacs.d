@@ -210,7 +210,9 @@ There are two things you can do about this warning:
 
 (add-hook 'after-init-hook 'my/after-init-load-themes)
 
-(load "local.el" t nil t t)
+(load (expand-file-name "local.el"
+                        user-emacs-directory)
+      t nil t t)
 
 ;; Visuals & frills
 
