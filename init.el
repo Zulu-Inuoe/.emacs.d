@@ -702,6 +702,9 @@ There are two things you can do about this warning:
   :bind (("M-p" . flycheck-previous-error)
          ("M-n" . flycheck-next-error)))
 
+(use-package flycheck-package
+  :ensure t)
+
 (when (>= emacs-major-version 25)
   (use-package ggtags
     :ensure t
