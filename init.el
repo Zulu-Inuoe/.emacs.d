@@ -436,7 +436,7 @@ There are two things you can do about this warning:
          ("C-x C-y" . helm-show-kill-ring)
          ("C-h SPC" . helm-all-mark-rings)
          :map helm-map
-         ("<Tab>" . helm-execute-persistent-action)
+         ("<tab>" . helm-execute-persistent-action)
          ("C-z" . helm-select-action)
          :map helm-find-files-map
          ("C-s" . helm-ff-run-grep-ag)
