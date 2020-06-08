@@ -265,6 +265,7 @@ There are two things you can do about this warning:
   (defvar my/lisp-impl-icon-alist
     '(("armedbear" . "abcl-mode_icon")
       ("ccl" . "ccl-mode_icon")
+      ("clisp" . "clisp-mode_icon")
       ("ECL" . "ecl-mode_icon")
       ("lispworks" . "lispworks-mode_icon")
       ("sbcl" . "sbcl-mode_icon")))
