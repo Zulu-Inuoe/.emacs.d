@@ -588,8 +588,7 @@ There are two things you can do about this warning:
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :bind
   (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("<f8>"       . treemacs-select-window)
         ("C-x t t"   . treemacs)
         ("C-x t B"   . treemacs-bookmark)
         ("C-x t C-t" . treemacs-find-file)
