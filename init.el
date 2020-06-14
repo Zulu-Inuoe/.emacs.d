@@ -350,7 +350,7 @@ There are two things you can do about this warning:
 ;; Navitation & Utils
 (use-package avy
   :ensure t
-  :bind (("M-g c" . avy-goto-char-timer)
+  :bind (("M-g c" . avy-goto-char)
          ("M-g M-g" . avy-goto-line)))
 
 (use-package ace-window
