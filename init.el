@@ -257,6 +257,7 @@ There are two things you can do about this warning:
   :hook (after-init . elcord-mode)
   :hook (elcord-mode . my/elcord-mode-hook)
   :config
+  (add-to-list 'elcord-mode-icon-alist '(bat-mode . "bat-mode_icon"))
   (add-to-list 'elcord-mode-icon-alist '(cypher-mode . "cypher-mode_icon"))
   (add-to-list 'elcord-mode-icon-alist '(powershell-mode . "powershell-mode_icon"))
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
