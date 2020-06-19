@@ -545,7 +545,7 @@ There are two things you can do about this warning:
   (add-hook 'ediff-after-quit-hook-internal 'winner-undo))
 
 (use-package macrostep
-  :after (emacs-lisp-mode)
+  :after (elisp-mode)
   :bind (:map emacs-lisp-mode-map
               ("C-c M-e" . macrostep-expand)))
 
@@ -665,7 +665,7 @@ There are two things you can do about this warning:
 (use-package editorconfig-charset-extras
   :ensure t)
 
-(use-package emacs-lisp-mode
+(use-package elisp-mode
   :defer nil
   :bind (:map emacs-lisp-mode-map
               ("C-x C-e" . my/eval-dwim)
