@@ -1067,11 +1067,6 @@ There are two things you can do about this warning:
 (use-package web-mode
   :ensure t
   :mode "\\.html?$"
-  :bind (:map web-mode-map
-              ("C-M-u" . web-mode-element-parent)
-              ("C-M-d" . web-mode-element-child)
-              ("C-M-f" . web-mode-element-next)
-              ("C-M-b" . web-mode-element-previous))
   :custom
   (web-mode-code-indent-offset 2)
   (web-mode-css-indent-offset 2)
@@ -1081,9 +1076,16 @@ There are two things you can do about this warning:
   (web-mode-enable-auto-quoting t)
   (web-mode-markup-indent-offset 2)
   (web-mode-auto-close-style 2)
+  (web-mode-enable-css-colorization t)
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-current-column-highlight t)
   :init
   (when (eq system-type 'windows-nt)
     (my/scoop-ensure "tidy")))
+
+(use-package web-mode-edit-element
+  :ensure t
+  :hook (web-mode . web-mode-edit-element-minor-mode))
 
 (use-package xref-js2
   :ensure t
