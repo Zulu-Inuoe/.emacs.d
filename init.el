@@ -887,19 +887,19 @@ There are two things you can do about this warning:
   (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
   (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill))
 
-(use-package prog-mode
-  :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode)
-  :config
-  (defun my/on-prog-mode ()
-    (setf truncate-lines t
-          word-wrap nil))
-  (add-hook 'prog-mode-hook 'my/on-prog-mode))
-
 (use-package lua-mode
   :ensure t
   :mode "\\.lua$"
   :interpreter "lua"
   :custom (lua-indent-level 4))
+
+(use-package markdown-mode
+  :ensure t
+  :mode "\\.text$"
+  :mode "\\.markdown$"
+  :mode "\\.md$"
+  :mode ("README\\.md$" . gfm-mode)
+  :custom (markdown-command "pandoc"))
 
 (use-package nxml-mode
   :mode "\\.proj$"
@@ -910,14 +910,6 @@ There are two things you can do about this warning:
   (nxml-attribute-indent 2)
   (nxml-slash-auto-complete-flag t))
 
-(use-package markdown-mode
-  :ensure t
-  :mode "\\.text$"
-  :mode "\\.markdown$"
-  :mode "\\.md$"
-  :mode ("README\\.md$" . gfm-mode)
-  :custom (markdown-command "pandoc"))
-
 (use-package omnisharp
   :ensure t
   :after company
@@ -927,6 +919,14 @@ There are two things you can do about this warning:
   :config
   (add-to-list 'company-backends 'company-omnisharp)
   (add-hook 'csharp-mode-hook 'omnisharp-mode))
+
+(use-package prog-mode
+  :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode)
+  :config
+  (defun my/on-prog-mode ()
+    (setf truncate-lines t
+          word-wrap nil))
+  (add-hook 'prog-mode-hook 'my/on-prog-mode))
 
 (use-package powershell
   :ensure t
