@@ -630,6 +630,12 @@ There are two things you can do about this warning:
      (java-mode . "java")
      (awk-mode . "awk"))))
 
+(use-package conf-mode
+  :hook (conf-mode . my/conf-set-tab-width)
+  :init
+  (defun my/conf-set-tab-width ()
+    (setq tab-width 2)))
+
 (use-package cperl-mode
   :ensure t
   :mode "\\.pl$"
