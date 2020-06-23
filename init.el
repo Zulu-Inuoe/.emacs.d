@@ -1,4 +1,7 @@
 ;;-*-coding: utf-8-unix; lexical-binding: t-*-
+
+(cd (expand-file-name "~/"))
+
 (require 'cl)
 (require 'subr-x)
 
