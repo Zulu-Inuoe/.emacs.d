@@ -211,7 +211,11 @@ There are two things you can do about this warning:
   ;; Doom will for whatever reason reset the buffer coding system..
   (setq-default buffer-file-coding-system 'utf-8-unix))
 
-(add-hook 'after-init-hook 'my/after-init-load-themes)
+(defun my/after-init-delay-load-themes ()
+  (run-at-time 0.25 nil 'my/after-init-load-themes))
+
+(add-hook 'window-setup-hook 'my/after-init-delay-load-themes)
+
 
 (load (expand-file-name "local.el"
                         user-emacs-directory)
