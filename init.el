@@ -739,11 +739,15 @@ There are two things you can do about this warning:
 
 (use-package gitattributes-mode
   :ensure t
-  :mode "^\\.gitattributes$")
+  :mode "^\\.gitattributes$"
+  :init
+  (pushnew '(gitattributes-mode . "git-mode_icon") elcord-mode-icon-alist))
 
 (use-package gitignore-mode
   :ensure t
-  :mode "^\\.gitignore$")
+  :mode "^\\.gitignore$"
+  :init
+  (pushnew '(gitignore-mode . "git-mode_icon") elcord-mode-icon-alist))
 
 (use-package gitconfig-mode
   :ensure t
