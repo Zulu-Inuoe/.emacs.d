@@ -243,12 +243,12 @@ There are two things you can do about this warning:
     (my/install-fonts)
     (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
 
-(use-package desktop
-  :ensure t
-  :defer nil
-  :config
-  (setq desktop-dirname user-emacs-directory)
-  (desktop-save-mode +1))
+;; (use-package desktop
+;;   :ensure t
+;;   :defer nil
+;;   :config
+;;   (setq desktop-dirname user-emacs-directory)
+;;   (desktop-save-mode +1))
 
 (when (>= emacs-major-version 25)
   (use-package doom-modeline
