@@ -42,15 +42,13 @@
 ;; Backup and auto-save settings
 (let* ((emacs-tmp-dir
         (file-name-as-directory
-         (expand-file-name "emacs" temporary-file-directory)))
+         (expand-file-name ".cache" user-emacs-directory)))
        (backups-dir
         (file-name-as-directory
          (expand-file-name "backups" emacs-tmp-dir)))
        (auto-saves-dir
         (file-name-as-directory
-         (expand-file-name "auto-saves" emacs-tmp-dir)))
-       (recentf-file
-        (expand-file-name "recentf" emacs-tmp-dir)))
+         (expand-file-name "auto-saves" emacs-tmp-dir))))
   (setq-default
    version-control t
    delete-old-versions t
@@ -62,7 +60,8 @@
    auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
    auto-save-list-file-prefix auto-saves-dir
    recentf-auto-cleanup 'never
-   recentf-save-file recentf-file
+   recentf-save-file (expand-file-name "recentf" emacs-tmp-dir)
+   save-place-file (expand-file-name "places" emacs-tmp-dir)
    ;; Make backup files even in vc'd directories
    vc-make-backup-files t))
 
@@ -325,6 +324,9 @@ There are two things you can do about this warning:
 
 (use-package projectile
   :ensure t
+  :custom
+  (projectile-cache-file (expand-file-name "projectile.cache" (expand-file-name ".cache" user-emacs-directory)))
+  (projectile-known-projects-file (expand-file-name "projectile-bookmarks.eld" (expand-file-name ".cache" user-emacs-directory)))
   :config
   (projectile-mode +1))
 
@@ -984,7 +986,7 @@ There are two things you can do about this warning:
   (sly-command-switch-to-existing-lisp 'always)
   (sly-ignore-protocol-mismatches t)
   (sly-kill-without-query-p t)
-  (sly-mrepl-history-file-name (expand-file-name ".sly-mrepl-history" user-emacs-directory))
+  (sly-mrepl-history-file-name (expand-file-name ".sly-mrepl-history" (expand-file-name ".cache" user-emacs-directory)))
   (sly-net-coding-system 'utf-8-unix)
   :config
   (define-advice sly-quit-lisp (:around (orig-function &optional kill interactive)
