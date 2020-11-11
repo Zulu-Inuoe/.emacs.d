@@ -102,7 +102,8 @@
  indicate-empty-lines t
  mode-require-final-newline nil
  mouse-yank-at-point t
- show-trailing-whitespace t)
+ show-trailing-whitespace t
+ history-delete-duplicates t)
 
 (when (eq system-type 'windows-nt)
   ;; Disable beeps on win32 and associate cp65001 with utf-8
