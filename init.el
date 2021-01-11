@@ -352,6 +352,11 @@ There are two things you can do about this warning:
   (solaire-global-mode +1)
   (solaire-mode-swap-bg))
 
+(use-package unicode-fonts
+  :ensure t
+  :init
+  (unicode-fonts-setup))
+
 (use-package whitespace
   :diminish global-whitespace-mode
   :custom
