@@ -2,7 +2,6 @@
 
 (cd (expand-file-name "~/"))
 
-(require 'cl)
 (require 'subr-x)
 
 ;; Turn on debugging so I can fix any init breakage. Turns off at the end
@@ -220,7 +219,6 @@ There are two things you can do about this warning:
 
 (add-hook 'window-setup-hook 'my/after-init-delay-load-themes)
 
-
 (load (expand-file-name "local.el"
                         user-emacs-directory)
       t nil t t)
@@ -273,6 +271,9 @@ There are two things you can do about this warning:
   (add-to-list 'elcord-mode-icon-alist '(powershell-mode . "powershell-mode_icon"))
   (add-to-list 'elcord-mode-text-alist '(powershell-mode . "Powershell"))
   (add-to-list 'elcord-mode-icon-alist '(rjsx-mode . "react-mode_icon"))
+  (add-to-list 'elcord-mode-icon-alist '(gitattributes-mode . "git-mode_icon"))
+  (add-to-list 'elcord-mode-icon-alist '(gitignore-mode . "git-mode_icon"))
+  (add-to-list 'elcord-mode-icon-alist '(gitconfig-mode . "git-mode_icon"))
 
   (defvar my/lisp-impl-icon-alist
     '(("armedbear" . "abcl-mode_icon")
@@ -400,7 +401,6 @@ There are two things you can do about this warning:
          ("C-S-<right>" . windsize-right)))
 
 (use-package winner
-  :ensure t
   :config
   (winner-mode +1))
 
@@ -550,7 +550,6 @@ There are two things you can do about this warning:
 ;; Misc tooling
 (use-package ediff
   :after (winner)
-  :ensure t
   :custom
   (ediff-window-setup-function 'ediff-setup-windows-plain)
   (ediff-split-window-function 'split-window-horizontally)
@@ -639,7 +638,6 @@ There are two things you can do about this warning:
   :mode "\\.asciidoc$")
 
 (use-package antlr-mode
-  :ensure t
   :mode "\\.g4$")
 
 (use-package cc-mode
@@ -657,7 +655,6 @@ There are two things you can do about this warning:
     (setq tab-width 2)))
 
 (use-package cperl-mode
-  :ensure t
   :mode "\\.pl$"
   :mode "\\.perl$"
   :custom
@@ -674,7 +671,6 @@ There are two things you can do about this warning:
   :ensure t)
 
 (use-package doc-view
-  :ensure t
   :bind (:map doc-view-mode-map
               ("M-v" . backward-page)
               ("C-v" . forward-page))
@@ -750,15 +746,11 @@ There are two things you can do about this warning:
 
 (use-package gitattributes-mode
   :ensure t
-  :mode "^\\.gitattributes$"
-  :init
-  (pushnew '(gitattributes-mode . "git-mode_icon") elcord-mode-icon-alist))
+  :mode "^\\.gitattributes$")
 
 (use-package gitignore-mode
   :ensure t
-  :mode "^\\.gitignore$"
-  :init
-  (pushnew '(gitignore-mode . "git-mode_icon") elcord-mode-icon-alist))
+  :mode "^\\.gitignore$")
 
 (use-package gitconfig-mode
   :ensure t
