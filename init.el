@@ -979,6 +979,8 @@ There are two things you can do about this warning:
               ("C-x C-e" . my/sly-eval-dwim)
               ;; ([remap sly-eval-last-expression] . my/sly-eval-in-mrepl)
               )
+  :bind (:map sly-inspector-mode-map
+              ("C-r" . sly-inspector-reinspect))
   :custom
   (inferior-lisp-program "sbcl")
   (sly-command-switch-to-existing-lisp 'always)
