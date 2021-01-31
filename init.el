@@ -354,6 +354,7 @@ There are two things you can do about this warning:
 
 (use-package unicode-fonts
   :ensure t
+  :defer nil
   :init
   (unicode-fonts-setup))
 
