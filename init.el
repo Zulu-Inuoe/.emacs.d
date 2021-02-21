@@ -979,7 +979,7 @@ There are two things you can do about this warning:
   :bind (:map sly-inspector-mode-map
               ("C-r" . sly-inspector-reinspect))
   :custom
-  (inferior-lisp-program "sbcl")
+  (inferior-lisp-program (list "sbcl" "--noinform" "--disable-ldb" "--lose-on-corruption"))
   (sly-command-switch-to-existing-lisp 'always)
   (sly-ignore-protocol-mismatches t)
   (sly-kill-without-query-p t)
