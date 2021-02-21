@@ -10,13 +10,10 @@
 
 ;; Excessive, but what else can I do?
 (setq-default buffer-file-coding-system 'utf-8-unix)
-(setq-default default-buffer-file-coding-system 'utf-8-unix)
-(setq default-buffer-file-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
 (prefer-coding-system 'utf-8-unix)
 (set-terminal-coding-system 'utf-8-unix)
 (set-keyboard-coding-system 'utf-8-unix)
-(setq-default buffer-file-coding-system 'utf-8-unix)
 (setq-default x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
 (defun my/add-load-if-exists (path)
