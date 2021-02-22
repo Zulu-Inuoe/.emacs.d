@@ -131,29 +131,22 @@
 
 ;;;; Set up package management info
 
-;; initialize all ELPA packages
-(when (< emacs-major-version 27)
-  (require 'package))
+;; straight.el bootstrap
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-Your version of Emacs does not support SSL connections,
-which is unsafe because it allows man-in-the-middle attacks.
-There are two things you can do about this warning:
-1. Install an Emacs version that does support SSL and be safe.
-2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
-
-(when (< emacs-major-version 27)
-  (package-initialize))
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
 (let ((lisp-dir (expand-file-name "lisp/" user-emacs-directory)))
   (when (file-exists-p lisp-dir)
@@ -162,20 +155,7 @@ There are two things you can do about this warning:
         (when (file-exists-p dirname)
           (add-to-list 'load-path dirname))))))
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(unless (package-installed-p 'diminish)
-  (package-install 'diminish))
-
-(unless (package-installed-p 'bind-key)
-  (package-install 'bind-key))
-
-;; Load use-package, used for loading packages everywhere else
-(eval-when-compile
-  (require 'use-package))
-
+;; Load diminish & bind-key to allow usage in use-package
 (use-package diminish)
 (use-package bind-key)
 
@@ -185,31 +165,33 @@ There are two things you can do about this warning:
 ;; Theme
 (setq-default custom-safe-themes t)
 
+;; solaire mode needs to be enabled before loading themes
+(use-package solaire-mode
+  :hook
+  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
+  (minibuffer-setup . solaire-mode-in-minibuffer)
+  :config
+  (solaire-global-mode +1))
+
 (define-advice load-theme (:before (theme &optional no-confirm no-enable)
                                    my/before-load-theme)
   (mapc #'disable-theme custom-enabled-themes))
 
-(unless (or (package-installed-p 'doom-themes) (package-installed-p 'zenburn-theme))
-  (package-install 'doom-themes))
+(use-package doom-themes)
 
 (defun my/after-init-load-themes ()
   (cond
-   ((package-installed-p 'doom-themes)
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
+   ((featurep 'doom-themes)
     (load-theme 'doom-one t)
     (doom-themes-visual-bell-config)
     (cond
-     ((package-installed-p 'treemacs)
+     ((featurep 'treemacs)
       ;; (doom-themes-treemacs-config)
       )
-     ((package-installed-p 'neotree)
+     ((featurep 'neotree)
       (doom-themes-neotree-config))))
-   ((package-installed-p 'zenburn-theme)
-    (load-theme 'zenburn t)))
-
-  ;; Doom will for whatever reason reset the buffer coding system..
-  (setq-default buffer-file-coding-system 'utf-8-unix))
+   ((featurep 'zenburn-theme)
+    (load-theme 'zenburn t))))
 
 (defun my/after-init-delay-load-themes ()
   (run-at-time 0.25 nil 'my/after-init-load-themes))
@@ -223,7 +205,6 @@ There are two things you can do about this warning:
 ;; Visuals & frills
 
 (use-package all-the-icons
-  :ensure t
   :config
   (when (eq system-type 'windows-nt)
     (defun my/install-fonts ()
@@ -242,23 +223,13 @@ There are two things you can do about this warning:
     (my/install-fonts)
     (add-hook 'kill-emacs-hook 'my/uninstall-fonts)))
 
-;; (use-package desktop
-;;   :ensure t
-;;   :defer nil
-;;   :config
-;;   (setq desktop-dirname user-emacs-directory)
-;;   (desktop-save-mode +1))
-
-(when (>= emacs-major-version 25)
-  (use-package doom-modeline
-    :custom
-    (doom-modeline-icon t)
-    (doom-modeline-major-mode-color-icon t)
-    :ensure t
-    :hook (after-init . doom-modeline-mode)))
+(use-package doom-modeline
+  :custom
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-color-icon t)
+  :hook (after-init . doom-modeline-mode))
 
 (use-package elcord
-  :ensure t
   :custom (elcord-use-major-mode-as-main-icon t)
   :hook (after-init . elcord-mode)
   :hook (elcord-mode . my/elcord-mode-hook)
@@ -309,7 +280,6 @@ There are two things you can do about this warning:
       (remove-hook 'delete-frame-functions 'elcord--disable-elcord-if-no-frames))))
 
 (use-package nyan-mode
-  :ensure t
   :custom
   (nyan-animate-nyancat t)
   (nyan-bar-length 10)
@@ -321,36 +291,23 @@ There are two things you can do about this warning:
   :hook ((lisp-mode emacs-lisp-mode) . show-paren-mode))
 
 (use-package projectile
-  :ensure t
   :custom
-  (projectile-cache-file (expand-file-name "projectile.cache" (expand-file-name ".cache" user-emacs-directory)))
-  (projectile-known-projects-file (expand-file-name "projectile-bookmarks.eld" (expand-file-name ".cache" user-emacs-directory)))
+  (projectile-cache-file (expand-file-name ".cache/projectile.cache" user-emacs-directory))
+  (projectile-known-projects-file (expand-file-name ".cache/projectile-bookmarks.eld" user-emacs-directory))
   :config
   (projectile-mode +1))
 
 (use-package psession
-  :ensure t
   :config
   (psession-mode +1)
   (psession-savehist-mode +1)
   (psession-autosave-mode +1))
 
 (use-package rainbow-delimiters
-  :ensure t
   :hook (lisp-mode . rainbow-delimiters-mode-enable)
   :hook (emacs-lisp-mode . rainbow-delimiters-mode-enable))
 
-(use-package solaire-mode
-  :ensure t
-  :hook
-  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-  (minibuffer-setup . solaire-mode-in-minibuffer)
-  :config
-  (solaire-global-mode +1)
-  (solaire-mode-swap-bg))
-
 (use-package unicode-fonts
-  :ensure t
   :defer nil
   :init
   (unicode-fonts-setup))
@@ -365,39 +322,33 @@ There are two things you can do about this warning:
 
 ;; Navitation & Utils
 (use-package avy
-  :ensure t
   :bind (("M-g c" . avy-goto-char)
          ("M-g M-g" . avy-goto-line)))
 
 (use-package ace-window
-  :ensure t
   :bind (("C-x o" . ace-window)))
 
-(when (>= emacs-major-version 25)
-  (use-package back-button
-    :ensure t
-    :diminish back-button-mode
-    :bind (("<mouse-4>" . back-button-global-backward)
-           ("<mouse-5>" . back-button-global-forward))))
+;; (when (>= emacs-major-version 25)
+;;   (use-package back-button
+;;     :diminish back-button-mode
+;;     :bind (("<mouse-4>" . back-button-global-backward)
+;;            ("<mouse-5>" . back-button-global-forward))))
 
 (use-package which-key
-  :ensure t
   :defer nil
   :diminish which-key-mode
   :config (which-key-mode +1))
 
-(use-package window-purpose
-  :ensure t
-  :custom (purpose-x-popwin-position 'right)
-  :config
-  (purpose-mode +1)
-  (require 'window-purpose-x)
-  (purpose-x-popwin-setup)
-  (purpose-x-kill-setup)
-  (purpose-x-magit-multi-on))
+;; (use-package window-purpose
+;;   :custom (purpose-x-popwin-position 'right)
+;;   :config
+;;   (purpose-mode +1)
+;;   (require 'window-purpose-x)
+;;   (purpose-x-popwin-setup)
+;;   (purpose-x-kill-setup)
+;;   (purpose-x-magit-multi-on))
 
 (use-package windsize
-  :ensure t
   :bind (("C-S-<up>" . windsize-up)
          ("C-S-<down>" . windsize-down)
          ("C-S-<left>" . windsize-left)
@@ -410,7 +361,6 @@ There are two things you can do about this warning:
 ;;;completion & input
 
 (use-package company
-  :ensure t
   :diminish company-mode
   :defer nil
   :bind
@@ -437,118 +387,113 @@ There are two things you can do about this warning:
     (company-abort)
     (self-insert-command 1)))
 
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
 (use-package elisp-slime-nav
-  :ensure t
   :diminish elisp-slime-nav-mode
   :hook ((lisp-interaction-mode emacs-lisp-mode) . elisp-slime-nav-mode))
 
-(use-package helm
-  :ensure t
-  :defer nil
-  :diminish helm-mode
-  :bind (("M-x" . helm-M-x)
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files)
-         ("C-x C-y" . helm-show-kill-ring)
-         ("C-h SPC" . helm-all-mark-rings)
-         :map helm-map
-         ("<tab>" . helm-execute-persistent-action)
-         ("C-z" . helm-select-action)
-         :map helm-find-files-map
-         ("C-s" . helm-ff-run-grep-ag)
-         :map helm-buffer-map
-         ("<tab>" . helm-next-source)
-         ("S-<tab>" . helm-previous-source)
-         :map helm-generic-files-map
-         ("<tab>" . helm-next-source)
-         ("S-<tab>" . helm-previous-source))
-  :custom
-  (helm-boring-buffer-regexp-list
-   '("\\*Buffer List" "\\*sly-events" "\\*Help" "\\*sly-inferior-lisp" "\\` " "\\`\\*helm" "\\`\\*Echo Area" "\\`\\*Minibuf"))
-  (helm-buffers-fuzzy-matching t)
-  (helm-ff-file-name-history-use-recentf t)
-  (helm-ff-skip-boring-files t)
-  (helm-grep-ag-command
-   "rg --color=always --smart-case --no-heading --line-number %s %s %s")
-  (helm-move-to-line-cycle-in-source t)
-  (helm-recentf-fuzzy-match t)
-  :config
-  (require 'helm-files)
-  (require 'helm-config)
-  (helm-mode +1))
+;; (use-package helm
+;;   :defer nil
+;;   :diminish helm-mode
+;;   :bind (("M-x" . helm-M-x)
+;;          ("C-x b" . helm-mini)
+;;          ("C-x C-f" . helm-find-files)
+;;          ("C-x C-y" . helm-show-kill-ring)
+;;          ("C-h SPC" . helm-all-mark-rings)
+;;          :map helm-map
+;;          ("<tab>" . helm-execute-persistent-action)
+;;          ("C-z" . helm-select-action)
+;;          :map helm-find-files-map
+;;          ("C-s" . helm-ff-run-grep-ag)
+;;          :map helm-buffer-map
+;;          ("<tab>" . helm-next-source)
+;;          ("S-<tab>" . helm-previous-source)
+;;          :map helm-generic-files-map
+;;          ("<tab>" . helm-next-source)
+;;          ("S-<tab>" . helm-previous-source))
+;;   :custom
+;;   (helm-boring-buffer-regexp-list
+;;    '("\\*Buffer List" "\\*sly-events" "\\*Help" "\\*sly-inferior-lisp" "\\` " "\\`\\*helm" "\\`\\*Echo Area" "\\`\\*Minibuf"))
+;;   (helm-buffers-fuzzy-matching t)
+;;   (helm-ff-file-name-history-use-recentf t)
+;;   (helm-ff-skip-boring-files t)
+;;   (helm-grep-ag-command
+;;    "rg --color=always --smart-case --no-heading --line-number %s %s %s")
+;;   (helm-move-to-line-cycle-in-source t)
+;;   (helm-recentf-fuzzy-match t)
+;;   :config
+;;   (require 'helm-files)
+;;   (require 'helm-config)
+;;   (helm-mode +1))
 
-(use-package helm-company
-  :after (helm company)
-  :ensure t
-  :defer nil
-  :bind (:map company-mode-map
-              ("C-S-SPC" . helm-company)
-              :map company-active-map
-              ("C-S-SPC" . helm-company)))
+;; (use-package helm-company
+;;   :after (helm company)
+;;   :defer nil
+;;   :bind (:map company-mode-map
+;;               ("C-S-SPC" . helm-company)
+;;               :map company-active-map
+;;               ("C-S-SPC" . helm-company)))
 
-(use-package helm-posframe
-  :after (helm)
-  :ensure t
-  :config
-  (helm-posframe-enable)
+;; (use-package helm-posframe
+;;   :after (helm)
+;;   :config
+;;   (helm-posframe-enable)
 
-  (defun my/posframe-poshandler-frame-top-center (info)
-    "Like `posframe-poshandler-frame-top-center', but accounts for x-pixel-offset and y-pixel-offset"
-    (cons (+ (/ (- (plist-get info :parent-frame-width)
-                   (plist-get info :posframe-width))
-                2)
-             (plist-get info :x-pixel-offset))
-          (plist-get info :y-pixel-offset)))
+;;   (defun my/posframe-poshandler-frame-top-center (info)
+;;     "Like `posframe-poshandler-frame-top-center', but accounts for x-pixel-offset and y-pixel-offset"
+;;     (cons (+ (/ (- (plist-get info :parent-frame-width)
+;;                    (plist-get info :posframe-width))
+;;                 2)
+;;              (plist-get info :x-pixel-offset))
+;;           (plist-get info :y-pixel-offset)))
 
-  (define-advice helm-posframe-display (:around (orig-function buffer &optional _resume)
-                                                my/around-helm-posframe-display)
-    (setq helm-posframe-buffer buffer)
-    (posframe-show
-     buffer
-     :position (point)
-     :poshandler 'my/posframe-poshandler-frame-top-center
-     :max-width (- (frame-width) 5)
-     :max-height (- (frame-height) 5)
-     :min-width (truncate (frame-width) 1.5)
-     :min-height (truncate (frame-height) 1.5)
-     :y-pixel-offset 15
-     :font helm-posframe-font
-     :override-parameters '((internal-border-width . 5)
-                            (border-width . 10))
-     :respect-header-line t)))
+;;   (define-advice helm-posframe-display (:around (orig-function buffer &optional _resume)
+;;                                                 my/around-helm-posframe-display)
+;;     (setq helm-posframe-buffer buffer)
+;;     (posframe-show
+;;      buffer
+;;      :position (point)
+;;      :poshandler 'my/posframe-poshandler-frame-top-center
+;;      :max-width (- (frame-width) 5)
+;;      :max-height (- (frame-height) 5)
+;;      :min-width (truncate (frame-width) 1.5)
+;;      :min-height (truncate (frame-height) 1.5)
+;;      :y-pixel-offset 15
+;;      :font helm-posframe-font
+;;      :override-parameters '((internal-border-width . 5)
+;;                             (border-width . 10))
+;;      :respect-header-line t)))
 
-(use-package helm-projectile
-  :after helm projectile
-  :ensure t
-  :config
-  (helm-projectile-on))
+;; (use-package helm-projectile
+;;   :after helm projectile
+;;   :config
+;;   (helm-projectile-on))
 
-(use-package helm-purpose
-  :after (helm window-purpose)
-  :ensure t
-  :bind (("M-x" . helm-M-x)
-         :map purpose-mode-map
-         ("C-x b" . helm-mini)
-         ("C-x C-f" . helm-find-files))
-  :config
-  (helm-purpose-setup))
+;; (use-package helm-purpose
+;;   :after (helm window-purpose)
+;;   :bind (("M-x" . helm-M-x)
+;;          :map purpose-mode-map
+;;          ("C-x b" . helm-mini)
+;;          ("C-x C-f" . helm-find-files))
+;;   :config
+;;   (helm-purpose-setup))
 
-(use-package helm-sly
-  :after (helm sly)
-  :ensure t
-  :config
-  (global-helm-sly-mode +1))
+;; (use-package helm-sly
+;;   :after (helm sly)
+;;   :config
+;;   (global-helm-sly-mode +1))
 
-(use-package helm-swoop
-  :after (helm)
-  :ensure t
-  :bind (("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point)
-         ("C-c M-i" . helm-multi-swoop)
-         ("C-x M-i" . helm-multi-swoop-all)
-         :map helm-swoop-map
-         ("C-s" . helm-next-line)
-         ("C-r" . helm-previous-line)))
+;; (use-package helm-swoop
+;;   :after (helm)
+;;   :bind (("M-i" . helm-swoop)
+;;          ("M-I" . helm-swoop-back-to-last-point)
+;;          ("C-c M-i" . helm-multi-swoop)
+;;          ("C-x M-i" . helm-multi-swoop-all)
+;;          :map helm-swoop-map
+;;          ("C-s" . helm-next-line)
+;;          ("C-r" . helm-previous-line)))
 
 ;; Misc tooling
 (use-package ediff
@@ -565,11 +510,9 @@ There are two things you can do about this warning:
 
 (when (and (executable-find "git")
            (>= emacs-major-version 25))
-  (use-package ssh-agency
-    :ensure t)
+  (use-package ssh-agency)
 
   (use-package magit
-    :ensure t
     :bind ("C-x g" . magit-status)
     :defer t
     :custom (magit-set-upstream-on-push 'dontask)
@@ -581,7 +524,6 @@ There are two things you can do about this warning:
     (setenv "SSH_ASKPASS" "git-gui--askpass")))
 
 (use-package rg
-  :ensure t
   :init
   (when (eq system-type 'windows-nt)
     (my/scoop-ensure "rg" "ripgrep"))
@@ -595,7 +537,6 @@ There are two things you can do about this warning:
   (slack-prefer-current-team t))
 
 (use-package treemacs
-  :ensure t
   :defer t
   :init
   (with-eval-after-load 'winum
@@ -609,33 +550,29 @@ There are two things you can do about this warning:
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-all-the-icons
-  :ensure t
   :after (treemacs)
   :init
   (treemacs-load-theme "all-the-icons"))
 
 (use-package treemacs-magit
-  :after treemacs magit
-  :ensure t)
+  :after treemacs magit)
 
 (use-package treemacs-projectile
-  :after treemacs projectile
-  :ensure t)
+  :after treemacs projectile)
+
 
 ;;;editing
 
-(use-package clution
-  :if (require 'clution nil t)
-  :custom
-  (clution-run-style 'term))
+(when (require 'clution nil t)
+  (use-package clution
+    :custom
+    (clution-run-style 'term)))
 
-(use-package dotenv-mode
-  :ensure t)
+(use-package dotenv-mode)
 
 ;;; languages & editing
 
 (use-package adoc-mode
-  :ensure t
   :mode "\\.adoc$"
   :mode "\\.ad$"
   :mode "\\.asciidoc$")
@@ -667,11 +604,9 @@ There are two things you can do about this warning:
   (cperl-indent-parens-as-block t))
 
 (use-package csharp-mode
-  :ensure t
   :mode "\\.cs$")
 
-(use-package cypher-mode
-  :ensure t)
+(use-package cypher-mode)
 
 (use-package doc-view
   :bind (:map doc-view-mode-map
@@ -681,14 +616,13 @@ There are two things you can do about this warning:
   (doc-view-ghostscript-program "gswin64c"))
 
 (use-package editorconfig
-  :ensure t
   :config
   (editorconfig-mode +1))
 
-(use-package editorconfig-charset-extras
-  :ensure t)
+(use-package editorconfig-charset-extras)
 
 (use-package elisp-mode
+  :straight nil
   :defer nil
   :bind (:map emacs-lisp-mode-map
               ("C-x C-e" . my/eval-dwim)
@@ -711,55 +645,55 @@ There are two things you can do about this warning:
 (use-package eldoc
   :diminish eldoc-mode
   :hook (emacs-lisp-mode . turn-on-eldoc-mode)
+  :hook (tide-mode . turn-on-eldoc-mode)
   :custom (eldoc-echo-area-use-multiline-p t))
 
 (use-package elpy
-  :ensure t
+  :after flycheck
   :config
   (elpy-enable)
-  (when (package-installed-p 'flycheck)
+  (with-eval-after-load 'flycheck
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (add-hook 'elpy-mode-hook 'flycheck-mode)))
 
+(use-package lsp-mode
+  :hook (js-mode . lsp)
+  :hook (web-mode . lsp))
+
 (use-package flycheck
-  :ensure t
   :bind (("M-p" . flycheck-previous-error)
-         ("M-n" . flycheck-next-error)))
+         ("M-n" . flycheck-next-error))
+  :hook (js2-mode . flycheck-mode))
 
-(use-package flycheck-package
-  :ensure t)
+(use-package flycheck-package)
 
-(when (>= emacs-major-version 25)
-  (use-package ggtags
-    :ensure t
-    :commands ggtags-mode
-    :diminish ggtags-mode
-    :bind (:map ggtags-mode-map
-                ("C-c g s" . ggtags-find-other-symbol)
-                ("C-c g h" . ggtags-view-tag-history)
-                ("C-c g r" . ggtags-find-reference)
-                ("C-c g f" . ggtags-find-file)
-                ("C-c g c" . ggtags-create-tags)
-                ("C-c g u" . ggtags-update-tags))
-    :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
-    :init
-    (defun my/enable-ggtags-mode-in-c-like ()
-      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-        (ggtags-mode +1)))))
+(use-package ggtags
+  :commands ggtags-mode
+  :diminish ggtags-mode
+  :bind (:map ggtags-mode-map
+              ("C-c g s" . ggtags-find-other-symbol)
+              ("C-c g h" . ggtags-view-tag-history)
+              ("C-c g r" . ggtags-find-reference)
+              ("C-c g f" . ggtags-find-file)
+              ("C-c g c" . ggtags-create-tags)
+              ("C-c g u" . ggtags-update-tags))
+  :hook (c-mode-common . my/enable-ggtags-mode-in-c-like)
+  :init
+  (defun my/enable-ggtags-mode-in-c-like ()
+    (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+      (ggtags-mode +1))))
 
 (use-package gitattributes-mode
-  :ensure t
   :mode "^\\.gitattributes$")
 
 (use-package gitignore-mode
-  :ensure t
   :mode "^\\.gitignore$")
 
 (use-package gitconfig-mode
-  :ensure t
   :mode "^\\.gitconfig$")
 
 (use-package help-mode
+  :straight nil
   :config
   (defun my/on-help-mode ()
     (setq truncate-lines nil
@@ -770,15 +704,13 @@ There are two things you can do about this warning:
   :mode ("\\.exe$" . hexl-mode)
   :mode ("\\.dll$" . hexl-mode))
 
-(use-package impatient-mode
-  :ensure t)
+(use-package impatient-mode)
 
 (use-package js
   :custom (js-indent-line 2))
 
 (use-package json-mode
-  :custom (js-indent-level 2)
-  :ensure t)
+  :custom (js-indent-level 2))
 
 (defun my/comment-region-if-mark ()
   (interactive)
@@ -786,17 +718,15 @@ There are two things you can do about this warning:
       (comment-region (min (point) (mark)) (max (point) (mark)))
     (self-insert-command 1)))
 
-(use-package js2-mode
-  :ensure t
-  :bind (:map js-mode-map
-              ("/" . my/comment-region-if-mark))
-  :mode "\\.js$"
-  :interpreter "node"
-  :hook (js2-mode . js2-imenu-extras-mode)
-  :custom (js2-basic-offset 2))
+;; (use-package js2-mode
+;;   :bind (:map js-mode-map
+;;               ("/" . my/comment-region-if-mark))
+;;   :mode "\\.js$"
+;;   :interpreter "node"
+;;   :hook (js2-mode . js2-imenu-extras-mode)
+;;   :custom (js2-basic-offset 2))
 
 (use-package js2-refactor
-  :ensure t
   :hook (js2-mode . js2-refactor-mode)
   :bind (:map js2-mode-map
               ("C-k" . js2r-kill))
@@ -804,122 +734,19 @@ There are two things you can do about this warning:
   (js2r-add-keybindings-with-prefix "C-c C-r"))
 
 (use-package lisp-mode
+  :straight nil
   :mode "\\.eclrc$"
   :mode "\\.ros$"
   :mode "\\.sbclrc$"
   :mode "\\.slynkrc$"
   :mode "\\.lispworks$")
 
-(use-package paredit
-  :ensure t
-  :diminish paredit-mode
-  :hook ((lisp-mode emacs-lisp-mode) . paredit-mode)
-  :config
-  (defun my/paredit-delete-region-or-forward ()
-    (interactive)
-    (if (use-region-p)
-        (paredit-delete-region (region-beginning) (region-end))
-      (paredit-forward-delete)))
-
-  (defun my/paredit-delete-region-or-backward ()
-    (interactive)
-    (if (use-region-p)
-        (paredit-delete-region (region-beginning) (region-end))
-      (paredit-backward-delete)))
-
-  (defun my/paredit-kill-region-or-kill ()
-    (interactive)
-    (if (use-region-p)
-        (paredit-kill-region (region-beginning) (region-end))
-      (paredit-kill)))
-
-  (defun my/paredit-comment-sexp ()
-    "Comment out the sexp at point."
-    (interactive)
-    (save-excursion
-      (mark-sexp)
-      (paredit-comment-dwim)))
-
-  (defun my/paredit-comment-line-or-sexp ()
-    (interactive)
-    (cond
-     ((use-region-p)
-      (save-excursion
-        (mark-sexp 1 t)
-        (paredit-comment-dwim)))
-     ((or (paredit-in-string-p)
-          (paredit-in-comment-p)
-          (paredit-in-char-p)
-          (looking-at "[[:space:]]*$")
-          (looking-at "[[:space:]]*;+.*$"))
-      (paredit-semicolon))
-     ((looking-at "[[:space:]]*(.*$")
-      (my/paredit-comment-sexp))
-     (t
-      (paredit-semicolon))))
-
-  (when (and (package-installed-p 'eldoc)
-             (symbol-function 'eldoc-add-command))
-    (eldoc-add-command
-     'paredit-backward-delete
-     'paredit-close-round))
-
-  (defun my/parse-dispatch-macro-backwards ()
-    (let ((old-point (point)))
-      (if (save-match-data
-            (and (not (member (char-before) '(?\( ?#)))
-                 (re-search-backward "#[0-9]*" nil t)
-                 (= (match-end 0) (- old-point 1))))
-          (point)
-        (goto-char old-point)
-        nil)))
-
-  (defun my/space-for-dispatch-macro (endp delim)
-    (save-excursion
-      (or endp
-          (not (my/parse-dispatch-macro-backwards)))))
-
-  (defun my/parse-dispatch-macro ()
-    (forward-comment (buffer-size))
-    (save-match-data
-      (when (looking-at "#[0-9]*[^(#0-9]")
-        (goto-char (match-end 0)))))
-
-  (defun my/cl-dispatch-macro-forward-sexp (n)
-    (cond
-     ((> n 0)
-      (dotimes (i n)
-        (my/parse-dispatch-macro)
-        (let ((forward-sexp-function nil))
-          (forward-sexp))))
-     ((< n 0)
-      (dotimes (i (- n))
-        (let ((forward-sexp-function nil))
-          (forward-sexp -1))
-        (let ((old-point (point)))
-          (forward-comment (- (buffer-size)))
-          (unless (my/parse-dispatch-macro-backwards)
-            (goto-char old-point)))))))
-
-  (defun my/cl-mode-hook ()
-    (setq-local forward-sexp-function 'my/cl-dispatch-macro-forward-sexp)
-    (make-local-variable 'paredit-space-for-delimiter-predicates)
-    (push 'my/space-for-dispatch-macro paredit-space-for-delimiter-predicates))
-
-  (add-hook 'lisp-mode-hook 'my/cl-mode-hook)
-  (define-key paredit-mode-map [remap paredit-semicolon] 'my/paredit-comment-line-or-sexp)
-  (define-key paredit-mode-map [remap paredit-forward-delete] 'my/paredit-delete-region-or-forward)
-  (define-key paredit-mode-map [remap paredit-backward-delete] 'my/paredit-delete-region-or-backward)
-  (define-key paredit-mode-map [remap paredit-kill] 'my/paredit-kill-region-or-kill))
-
 (use-package lua-mode
-  :ensure t
   :mode "\\.lua$"
   :interpreter "lua"
-  :custom (lua-indent-level 4))
+  :custom (lua-indent-level 2))
 
 (use-package markdown-mode
-  :ensure t
   :mode "\\.text$"
   :mode "\\.markdown$"
   :mode "\\.md$"
@@ -927,6 +754,7 @@ There are two things you can do about this warning:
   :custom (markdown-command "pandoc"))
 
 (use-package nxml-mode
+  :straight nil
   :mode "\\.proj$"
   :mode "\\.lyr$"
   :mode "\\.mtl$"
@@ -936,16 +764,16 @@ There are two things you can do about this warning:
   (nxml-slash-auto-complete-flag t))
 
 (use-package omnisharp
-  :ensure t
   :after company
+  :hook (csharp-mode . omnisharp-mode)
   :init
   (when (eq system-type 'windows-nt)
     (my/scoop-ensure "pandoc"))
   :config
-  (add-to-list 'company-backends 'company-omnisharp)
-  (add-hook 'csharp-mode-hook 'omnisharp-mode))
+  (add-to-list 'company-backends 'company-omnisharp))
 
 (use-package prog-mode
+  :straight nil
   :hook ((lisp-mode emacs-lisp-mode) . prettify-symbols-mode)
   :config
   (defun my/on-prog-mode ()
@@ -954,23 +782,61 @@ There are two things you can do about this warning:
   (add-hook 'prog-mode-hook 'my/on-prog-mode))
 
 (use-package powershell
-  :ensure t
   :mode ("\\.ps1$" . powershell-mode))
 
 (use-package restclient
-  :ensure t
   :after json-mode
   :mode (("\\.http$" . restclient-mode))
   :bind (:map restclient-mode-map
               ("C-c C-f" . json-mode-beautify)))
 
-(use-package slime
-  :if (package-installed-p 'slime)
-  :custom (slime-contribs '(slime-fancy)))
+(use-package smartparens
+  :hook ((lisp-mode emacs-lisp-mode) . smartparens-strict-mode)
+  :hook (js-mode . smartparens-mode)
+  :hook (sgml-mode . smartparens-mode)
+  :hook (web-mode . smartparens-mode)
+  :hook (nxml-mode . smartparens-mode)
+  :bind (:map smartparens-mode-map
+              ("C-M-f" . sp-forward-sexp)
+              ("C-M-b" . sp-backward-sexp)
+
+              ("C-M-d" . sp-down-sexp)
+              ("C-M-a" . sp-backward-down-sexp)
+              ("C-S-d" . sp-beginning-of-sexp)
+              ("C-S-a" . sp-end-of-sexp)
+
+              ("C-M-e" . sp-up-sexp)
+              ("C-M-u" . sp-backward-up-sexp)
+
+              ("C-M-t" . sp-transpose-sexp)
+
+              ("C-M-n" . sp-forward-hybrid-sexp)
+              ("C-M-p" . sp-backward-hybrid-sexp)
+
+              ("C-M-k" . sp-kill-sexp)
+              ("C-M-w" . sp-copy-sexp)
+
+              ("M-<delete>" . sp-unwrap-sexp)
+              ("M-<backspace>" . sp-backward-unwrap-sexp)
+
+              ("C-<right>" . sp-forward-slurp-sexp)
+              ("C-<left>" . sp-forward-barf-sexp)
+              ("C-M-<right>" . sp-backward-slurp-sexp)
+              ("C-M-<left>" . sp-backward-barf-sexp)
+
+
+              ("M-D" . sp-splice-sexp)
+              ("C-M-<delete>" . sp-splice-sexp-killing-forward)
+              ("C-M-<backspace>" . sp-splice-sexp-killing-backward)
+              ("C-S-<backspace>" . sp-splice-sexp-killing-around))
+  :bind (:map emacs-lisp-mode-map
+              (";" . sp-comment))
+  :bind (:map lisp-mode-map
+              (";" . sp-comment))
+  :config
+  (require 'smartparens-config))
 
 (use-package sly
-  :ensure t
-  ;; :if (package-installed-p 'sly)
   :defer nil
   :bind (:map sly-mode-map
               ("C-x C-e" . my/sly-eval-dwim)
@@ -1033,14 +899,13 @@ There are two things you can do about this warning:
   ;; Change directory of the buffer when we change directory in sly
   (add-hook 'sly-change-directory-hooks 'cd)
   (remove-hook 'sly-compilation-finished-hook 'sly-show-compilation-log)
-  (add-hook 'sly-compilation-finished-hook 'sly-maybe-show-compilation-log))
+  (add-hook 'sly-compilation-finished-hook 'sly-maybe-show-compilation-log)
 
-(when (package-installed-p 'company)
-  (add-hook 'sly-mrepl-hook 'company-mode))
+  (with-eval-after-load 'company
+    (add-hook 'sly-mrepl-hook 'company-mode)))
 
 (use-package sly-asdf
   :after (sly)
-  :ensure t
   :bind (:map sly-mode-map
               ("C-c L" . my/load-current-system-or-ask))
   :defer nil
@@ -1056,34 +921,50 @@ There are two things you can do about this warning:
     (funcall orig-function prompt (or default-value (car sly-asdf-system-history) (sly-asdf-find-current-system)))))
 
 (use-package sly-macrostep
-  :after (sly)
-  :ensure t)
+  :after (sly))
 
 (use-package sly-named-readtables
-  :after (sly)
-  :ensure t)
+  :after (sly))
 
 (use-package sly-repl-ansi-color
-  :ensure t
   :after (sly)
   :config (add-to-list 'sly-contribs 'sly-repl-ansi-color))
 
 (use-package simple
+  :straight nil
   :hook ((text-mode help-mode) . turn-on-visual-line-mode))
 
 (use-package sql-indent
-  :ensure t
   :hook (sql-mode . sqlind-minor-mode))
 
+(use-package ten
+  :straight nil
+  :config
+  (defun my/enable-ten-web-mode-hook ()
+    (when (string= (file-name-extension buffer-file-name) "thtml")
+      (ten-mode +1)))
+  (add-hook 'web-mode-hook 'my/enable-ten-web-mode-hook))
+
 (use-package text-mode
+  :straight nil
   :config
   (defun my/on-text-mode ()
     (setq truncate-lines nil
           word-wrap t))
   (add-hook 'text-mode-hook 'my/on-text-mode))
 
+(use-package tide
+  :after (typescript-mode company flycheck)
+  :hook ((js2-mode . tide-setup)
+         (js2-mode . tide-hl-identifier-mode)
+         (typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
+
+(use-package typescript-mode
+  :mode "\\.ts$")
+
 (use-package visual-fill-column
-  :ensure t
   :hook (visual-line-mode . visual-fill-column-mode)
   :custom
   (visual-fill-column-center-text nil)
@@ -1092,8 +973,8 @@ There are two things you can do about this warning:
   (advice-add 'text-scale-adjust :after 'visual-fill-column-adjust))
 
 (use-package web-mode
-  :ensure t
   :mode "\\.html?$"
+  :mode "\\.thtml?$"
   :custom
   (web-mode-code-indent-offset 2)
   (web-mode-css-indent-offset 2)
@@ -1111,11 +992,9 @@ There are two things you can do about this warning:
     (my/scoop-ensure "tidy")))
 
 (use-package web-mode-edit-element
-  :ensure t
   :hook (web-mode . web-mode-edit-element-minor-mode))
 
 (use-package xref-js2
-  :ensure t
   :after js2-mode
   :config
   ;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
@@ -1126,8 +1005,7 @@ There are two things you can do about this warning:
     (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))
   (add-hook 'js2-mode-hook 'my/add-js2-xref-backend))
 
-(use-package yaml-mode
-  :ensure t)
+(use-package yaml-mode)
 
 (defun my/eval-sexp-and-replace (prefix)
   (interactive "P")
@@ -1151,11 +1029,15 @@ There are two things you can do about this warning:
       (kill-region (region-beginning) (region-end))
     (kill-line)))
 
+(global-set-key [remap kill-line] 'my/kill-region-or-kill-line)
+
 (defun my/kill-region-or-kill-word (arg)
   (interactive "p")
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
     (kill-word arg)))
+
+(global-set-key [remap kill-word] 'my/kill-region-or-kill-word)
 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
@@ -1182,25 +1064,13 @@ There are two things you can do about this warning:
 
 (global-set-key (kbd "<C-f4>") 'my/kill-current-buffer)
 
-(global-set-key (kbd "<C-tab>") 'other-window)
-(defun my/previous-window ()
-  (interactive)
-  (other-window -1))
-(global-set-key (kbd "<C-S-tab>") 'my/previous-window)
-
-(global-set-key [remap kill-line] 'my/kill-region-or-kill-line)
-(global-set-key [remap kill-word] 'my/kill-region-or-kill-word)
-
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-
 ;;Line numbers on files
 (when (symbol-function 'display-line-numbers-mode)
   (add-hook 'find-file-hook 'display-line-numbers-mode)
   (setq-default display-line-numbers-width 3))
 
-(when (and (package-installed-p 'window-purpose)
-           (package-installed-p 'magit))
+(when (and (featurep 'window-purpose)
+           (featurep 'magit))
   (purpose-set-extension-configuration
    :magit
    (purpose-conf :mode-purposes '((magit-mode . Magit))))
@@ -1211,8 +1081,8 @@ There are two things you can do about this warning:
                  purpose-display-reuse-window-purpose
                  purpose-display-pop-up-frame)))
 
-(when (and (package-installed-p 'window-purpose)
-           (package-installed-p 'sly))
+(when (and (featurep 'window-purpose)
+           (featurep 'sly))
   (purpose-set-extension-configuration
    :sly
    (purpose-conf :name-purposes '(("*sly-macroexpansion*" . search)
@@ -1261,7 +1131,7 @@ There are two things you can do about this warning:
           minor-mode-overriding-map-alist))
   (add-hook 'sly-db-mode-hook 'my/sly-db-mode-hook))
 
-(when (package-installed-p 'window-purpose)
+(when (featurep 'window-purpose)
   (defun my/load-default-layout (frame)
     (when (file-exists-p purpose-default-layout-file)
       (with-selected-frame frame
@@ -1272,6 +1142,5 @@ There are two things you can do about this warning:
     (with-selected-frame frame
       (purpose-save-window-layout-file)))
   (add-hook 'delete-frame-functions 'my/save-default-layout t))
-
 
 (setq debug-on-error nil)
